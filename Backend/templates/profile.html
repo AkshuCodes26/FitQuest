@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<script>(function(){var t=localStorage.getItem("fq_theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FitQuest — My Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --pink:#ff6b9d; --purple:#c77dff; --blue:#72b7f5; --teal:#5ecfcf;
+      --yellow:#ffd166; --green:#6bcb77; --orange:#ff9a3c;
+      --bg:#fdf6ff; --card:#ffffff; --text:#3a2d5f; --light:#8a7aaa; --border:#ede8ff;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Nunito',sans-serif; background:var(--bg); min-height:100vh; }
+    nav { background:#fff; border-bottom:2px solid var(--border); padding:0 30px; display:flex; align-items:center; justify-content:space-between; height:65px; position:sticky; top:0; z-index:100; box-shadow:0 2px 20px rgba(100,60,180,0.07); }
+    .nav-brand { display:flex; align-items:center; gap:10px; text-decoration:none; }
+    .nav-icon { width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg,var(--pink),var(--purple)); display:flex; align-items:center; justify-content:center; font-size:20px; }
+    .nav-title { font-family:'Fredoka One',cursive; font-size:26px; background:linear-gradient(135deg,var(--pink),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .nav-links { display:flex; gap:6px; }
+    .nav-link { padding:8px 16px; border-radius:10px; font-size:13px; font-weight:800; color:var(--light); text-decoration:none; transition:all 0.2s; }
+    .nav-link:hover,.nav-link.active { background:linear-gradient(135deg,var(--pink),var(--purple)); color:#fff; }
+    .btn-logout { padding:8px 16px; border:2px solid var(--border); border-radius:10px; background:transparent; font-family:'Nunito',sans-serif; font-size:13px; font-weight:800; color:var(--light); cursor:pointer; transition:all 0.2s; }
+    .btn-logout:hover { background:#fff0f3; color:var(--pink); border-color:var(--pink); }
+    main { max-width:1000px; margin:0 auto; padding:30px 20px; }
+
+    /* PROFILE HERO */
+    .profile-hero { background:linear-gradient(135deg,var(--purple),var(--pink)); border-radius:24px; padding:32px; margin-bottom:24px; display:flex; align-items:center; gap:28px; box-shadow:0 8px 30px rgba(199,125,255,0.3); position:relative; overflow:hidden; }
+    .profile-hero::before { content:''; position:absolute; top:-30px; right:-30px; width:200px; height:200px; background:rgba(255,255,255,0.08); border-radius:50%; }
+    .avatar { width:90px; height:90px; border-radius:50%; background:rgba(255,255,255,0.25); border:3px solid rgba(255,255,255,0.5); display:flex; align-items:center; justify-content:center; font-size:44px; flex-shrink:0; animation:bounce 2s ease infinite; z-index:1; }
+    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+    .hero-info { z-index:1; flex:1; }
+    .hero-info h2 { font-family:'Fredoka One',cursive; font-size:32px; color:#fff; margin-bottom:4px; }
+    .hero-info p { color:rgba(255,255,255,0.85); font-size:14px; font-weight:600; }
+    .hero-badges { display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+    .hero-badge { padding:6px 14px; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); border-radius:99px; font-size:12px; font-weight:800; color:#fff; }
+    .hero-edit-btn { background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.4); border-radius:12px; padding:10px 18px; color:#fff; font-family:'Nunito',sans-serif; font-size:13px; font-weight:800; cursor:pointer; z-index:1; transition:all 0.2s; }
+    .hero-edit-btn:hover { background:rgba(255,255,255,0.35); }
+
+    /* STATS */
+    .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+    .stat-card { background:#fff; border-radius:18px; padding:18px; border:2px solid var(--border); text-align:center; transition:transform 0.2s; }
+    .stat-card:hover { transform:translateY(-3px); }
+    .stat-icon { font-size:26px; margin-bottom:6px; }
+    .stat-val { font-family:'Fredoka One',cursive; font-size:24px; color:var(--text); }
+    .stat-label { font-size:11px; color:var(--light); font-weight:800; text-transform:uppercase; letter-spacing:0.5px; }
+
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
+    .c { background:#fff; border-radius:20px; padding:22px; border:2px solid var(--border); }
+    .c-head { display:flex; align-items:center; gap:8px; margin-bottom:18px; }
+    .c-head h3 { font-family:'Fredoka One',cursive; font-size:18px; color:var(--text); }
+    .dot { width:10px; height:10px; border-radius:50%; }
+
+    /* FORM */
+    .fg { margin-bottom:13px; }
+    .fg label { display:block; font-size:11px; font-weight:800; color:var(--text); margin-bottom:5px; text-transform:uppercase; letter-spacing:0.5px; }
+    .fg input,.fg select { width:100%; padding:10px 13px; border:2px solid var(--border); border-radius:12px; font-family:'Nunito',sans-serif; font-size:13px; font-weight:600; color:var(--text); background:#fdfaff; outline:none; transition:border-color 0.2s; appearance:none; }
+    .fg input:focus,.fg select:focus { border-color:var(--purple); background:#fff; box-shadow:0 0 0 4px rgba(199,125,255,0.15); }
+    .fg input:disabled { background:var(--border); color:var(--light); cursor:not-allowed; }
+    .frow { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .btn-save { width:100%; padding:13px; border:none; border-radius:13px; background:linear-gradient(135deg,var(--pink),var(--purple)); color:#fff; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; cursor:pointer; transition:transform 0.2s,box-shadow 0.2s; margin-top:4px; }
+    .btn-save:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(199,125,255,0.4); }
+
+    /* PROFILE INFO VIEW */
+    .info-row { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border); }
+    .info-row:last-child { border-bottom:none; }
+    .info-label { font-size:13px; font-weight:700; color:var(--light); display:flex; align-items:center; gap:6px; }
+    .info-val { font-size:14px; font-weight:800; color:var(--text); }
+
+    /* TOGGLES */
+    .toggle-row { display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--border); }
+    .toggle-row:last-child { border-bottom:none; }
+    .toggle-info h4 { font-size:14px; font-weight:800; color:var(--text); }
+    .toggle-info p { font-size:12px; color:var(--light); font-weight:600; }
+    .toggle { position:relative; width:48px; height:26px; flex-shrink:0; }
+    .toggle input { opacity:0; width:0; height:0; }
+    .slider { position:absolute; cursor:pointer; inset:0; background:var(--border); border-radius:99px; transition:0.3s; }
+    .slider::before { content:''; position:absolute; height:20px; width:20px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:0.3s; }
+    input:checked + .slider { background:linear-gradient(135deg,var(--pink),var(--purple)); }
+    input:checked + .slider::before { transform:translateX(22px); }
+
+    /* BMI */
+    .bmi-wrap { text-align:center; padding:10px 0; }
+    .bmi-val { font-family:'Fredoka One',cursive; font-size:48px; color:var(--text); }
+    .bmi-label { font-size:14px; font-weight:800; padding:6px 18px; border-radius:99px; display:inline-block; margin:8px 0; }
+    .bmi-track { background:linear-gradient(90deg,#72b7f5,#6bcb77,#ffd166,#ff9a3c,#ff6b9d); border-radius:99px; height:10px; margin:10px 0; position:relative; }
+    .bmi-ptr { position:absolute; top:-4px; width:18px; height:18px; background:#fff; border:3px solid var(--text); border-radius:50%; transform:translateX(-50%); transition:left 1s ease; }
+
+    /* BADGES */
+    .badges-full { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .badge-full { border-radius:16px; padding:16px; text-align:center; border:2px solid var(--border); transition:transform 0.2s; }
+    .badge-full:hover { transform:translateY(-3px); }
+    .badge-full.earned { background:linear-gradient(135deg,#fff8e0,#fff0c0); border-color:var(--yellow); box-shadow:0 4px 16px rgba(255,209,102,0.3); }
+    .badge-full.locked { opacity:0.4; filter:grayscale(1); }
+    .badge-full .bi { font-size:32px; margin-bottom:8px; }
+    .badge-full .bn { font-size:12px; font-weight:800; color:var(--text); margin-bottom:3px; }
+    .badge-full .bd { font-size:11px; color:var(--light); font-weight:600; }
+
+    /* DANGER ZONE */
+    .danger-zone { background:#fff0f3; border:2px solid #ffb3c1; border-radius:20px; padding:22px; margin-bottom:20px; }
+    .danger-zone h3 { font-family:'Fredoka One',cursive; font-size:18px; color:#c0392b; margin-bottom:8px; }
+    .danger-zone p { font-size:13px; color:#c0392b; font-weight:600; margin-bottom:16px; }
+    .btn-delete { padding:12px 24px; border:2px solid #c0392b; border-radius:12px; background:transparent; color:#c0392b; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; cursor:pointer; transition:all 0.2s; }
+    .btn-delete:hover { background:#c0392b; color:#fff; }
+
+    /* MODAL */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200; display:none; align-items:center; justify-content:center; }
+    .modal-overlay.show { display:flex; }
+    .modal { background:#fff; border-radius:24px; padding:32px; max-width:400px; width:90%; text-align:center; animation:fadeIn 0.3s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
+    .modal h3 { font-family:'Fredoka One',cursive; font-size:24px; color:var(--text); margin-bottom:8px; }
+    .modal p { font-size:14px; color:var(--light); font-weight:600; margin-bottom:20px; }
+    .modal-btns { display:flex; gap:10px; }
+    .btn-cancel { flex:1; padding:12px; border:2px solid var(--border); border-radius:12px; background:transparent; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; color:var(--light); cursor:pointer; }
+    .btn-confirm-delete { flex:1; padding:12px; border:none; border-radius:12px; background:linear-gradient(135deg,#ff6b6b,#c0392b); color:#fff; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; cursor:pointer; }
+
+    .alert { padding:11px 14px; border-radius:12px; font-size:13px; font-weight:700; margin-bottom:13px; display:none; }
+    .alert.success { background:#e8faf0; color:#2d8a57; border:2px solid #a8e6c0; display:block; }
+    .alert.error { background:#fff0f3; color:#c0392b; border:2px solid #ffb3c1; display:block; }
+
+    @media(max-width:700px){ .grid2{grid-template-columns:1fr} .stats{grid-template-columns:1fr 1fr} .profile-hero{flex-direction:column;text-align:center} }
+  </style>
+</head>
+<body>
+
+<!-- DELETE MODAL -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div style="font-size:48px;margin-bottom:12px">⚠️</div>
+    <h3>Delete Account?</h3>
+    <p>This will permanently delete your account, all your logs, progress and badges. This cannot be undone!</p>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-confirm-delete" onclick="confirmDelete()">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<nav>
+  <a class="nav-brand" href="/dashboard"><div class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4v16M18 4v16M3 8h3M18 8h3M3 16h3M18 16h3M6 12h12"/></svg></div><span class="nav-title">FitQuest</span></a>
+  <div class="nav-links">
+    <a class="nav-link" href="/dashboard">Home</a>
+    <a class="nav-link" href="/diet"><span style="display:inline-flex;align-items:center;gap:8px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><line x1="9" y1="12" x2="15" y2="12"/></svg> Diet</span></a>
+    <a class="nav-link" href="/exercise"><span style="display:inline-flex;align-items:center;gap:8px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4v16M18 4v16M3 8h3M18 8h3M3 16h3M18 16h3M6 12h12"/></svg> Exercise</span></a>
+    <a class="nav-link active" href="/profile"><span style="display:inline-flex;align-items:center;gap:8px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profile</span></a>
+  </div>
+  <button class="btn-logout" onclick="logout()"><span style="display:inline-flex;align-items:center;gap:8px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Logout</span></button>
+</nav>
+
+<main>
+  <!-- HERO -->
+  <div class="profile-hero">
+    <div class="avatar" id="avatarEmoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v16M18 4v16M3 8h3M18 8h3M3 16h3M18 16h3M6 12h12"/></svg></div>
+    <div class="hero-info">
+      <h2 id="heroName">Loading...</h2>
+      <p id="heroEmail">–</p>
+      <div class="hero-badges">
+        <span class="hero-badge" id="heroLevel">⚡ Level 1</span>
+        <span class="hero-badge" id="heroStreak">🔥 0 day streak</span>
+        <span class="hero-badge" id="heroPoints">⭐ 0 pts</span>
+        <span class="hero-badge" id="heroBMI">📊 BMI: –</span>
+      </div>
+    </div>
+    <button class="hero-edit-btn" onclick="toggleEdit()">✏️ Edit Profile</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card"><div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="stat-val" id="sBMI">–</div><div class="stat-label">BMI</div></div>
+    <div class="stat-card"><div class="stat-icon">🏆</div><div class="stat-val" id="sLevel">–</div><div class="stat-label">Level</div></div>
+    <div class="stat-card"><div class="stat-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ff6b9d" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="stat-val" id="sStreak">–</div><div class="stat-label">Day Streak</div></div>
+    <div class="stat-card"><div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div><div class="stat-val" id="sPoints">–</div><div class="stat-label">Total Points</div></div>
+  </div>
+
+  <div class="grid2">
+    <!-- LEFT: PROFILE INFO + EDIT -->
+    <div class="c">
+      <div class="c-head"><div class="dot" style="background:var(--purple)"></div><h3>My Information 👤</h3></div>
+
+      <!-- VIEW MODE -->
+      <div id="viewMode">
+        <div class="info-row"><span class="info-label">😊 Name</span><span class="info-val" id="infoName">–</span></div>
+        <div class="info-row"><span class="info-label">🎂 Age</span><span class="info-val" id="infoAge">–</span></div>
+        <div class="info-row"><span class="info-label">⚧ Gender</span><span class="info-val" id="infoGender">–</span></div>
+        <div class="info-row"><span class="info-label">📏 Height</span><span class="info-val" id="infoHeight">–</span></div>
+        <div class="info-row"><span class="info-label">⚖️ Weight</span><span class="info-val" id="infoWeight">–</span></div>
+        <div class="info-row"><span class="info-label">🎯 Goal</span><span class="info-val" id="infoGoal">–</span></div>
+        <div class="info-row"><span class="info-label">📧 Email</span><span class="info-val" id="infoEmail">–</span></div>
+        <div class="info-row"><span class="info-label">📅 Member Since</span><span class="info-val" id="infoDate">–</span></div>
+      </div>
+
+      <!-- EDIT MODE -->
+      <div id="editMode" style="display:none">
+        <div class="alert" id="saveAlert"></div>
+        <div class="fg"><label>😊 Name</label><input type="text" id="pName"/></div>
+        <div class="frow">
+          <div class="fg"><label>🎂 Age</label><input type="number" id="pAge"/></div>
+          <div class="fg"><label>🎯 Goal</label>
+            <select id="pGoal">
+              <option value="Weight Loss">🔥 Weight Loss</option>
+              <option value="Muscle Gain">💪 Muscle Gain</option>
+              <option value="Maintenance">⚖️ Maintenance</option>
+              <option value="Endurance">🏃 Endurance</option>
+            </select>
+          </div>
+        </div>
+        <div class="frow">
+          <div class="fg"><label>📏 Height (cm)</label><input type="number" id="pHeight"/></div>
+          <div class="fg"><label>⚖️ Weight (kg)</label><input type="number" id="pWeight"/></div>
+        </div>
+        <button class="btn-save" onclick="saveProfile(this)">💾 Save Changes</button>
+        <button class="btn-save" style="background:var(--border);color:var(--light);margin-top:8px" onclick="toggleEdit()">Cancel</button>
+      </div>
+
+      <!-- HEALTH TOGGLES -->
+      <div style="margin-top:20px">
+        <div class="c-head"><div class="dot" style="background:var(--yellow)"></div><h3>Health Settings </h3></div>
+        <div class="toggle-row">
+          <div class="toggle-info"><h4>😴 Rest Mode</h4><p>Skip intense workouts today</p></div>
+          <label class="toggle"><input type="checkbox" id="togRest" onchange="updateToggle()"/><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info"><h4>🤕 Injury Mode</h4><p>Only show safe exercises</p></div>
+          <label class="toggle"><input type="checkbox" id="togInjury" onchange="updateToggle()"/><span class="slider"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: BMI + BADGES -->
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <!-- BMI -->
+      <div class="c">
+        <div class="c-head"><div class="dot" style="background:var(--blue)"></div><h3>BMI Meter 📊</h3></div>
+        <div class="bmi-wrap">
+          <div class="bmi-val" id="bmiVal">–</div>
+          <div class="bmi-label" id="bmiLabel">Loading...</div>
+          <div style="font-size:12px;color:var(--light);font-weight:600;margin-top:4px" id="bmiRange">–</div>
+          <div class="bmi-track"><div class="bmi-ptr" id="bmiPtr" style="left:10%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:800;color:var(--light)">
+            <span>Under</span><span>Normal</span><span>Over</span><span>Obese</span>
+          </div>
+          <div style="font-size:13px;font-weight:700;color:var(--light);margin-top:10px;text-align:center" id="bmiAdvice">–</div>
+        </div>
+      </div>
+
+      <!-- BADGES -->
+      <div class="c">
+        <div class="c-head"><div class="dot" style="background:var(--yellow)"></div><h3>My Badges 🏅</h3></div>
+        <div class="badges-full" id="badgesFull">
+          <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--light);font-weight:700">Loading...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DANGER ZONE -->
+  <div class="danger-zone">
+    <h3>⚠️ Danger Zone</h3>
+    <p>Deleting your account will permanently remove all your data including progress, logs, and badges. This action cannot be undone.</p>
+    <button class="btn-delete" onclick="showDeleteModal()">Delete My Account</button>
+  </div>
+
+</main>
+
+<script>
+const API = '/api';
+const LEVELS = ['Beginner','Rookie','Warrior','Champion','Legend','Grand Master'];
+const BADGE_ICONS = {'7-Day Consistency':'🗓️','Calorie Control Champion':'🥗','Hydration Hero':'💧','First Step':'👟','Streak Master':'🔥'};
+let isEditMode = false;
+
+async function loadProfile() {
+  try {
+    const res = await fetch(`${API}/profile`, {credentials:'include'});
+    if (!res.ok) { window.location.href='/login'; return; }
+    const p = await res.json();
+
+    // HERO
+    document.getElementById('heroName').textContent = p.Name || '–';
+    document.getElementById('heroEmail').textContent = p.Email || '–';
+    document.getElementById('heroLevel').textContent = `⚡ Level ${p.Level_Status||1}`;
+    document.getElementById('heroStreak').textContent = `🔥 ${p.Streak_Days||0} day streak`;
+    document.getElementById('heroPoints').textContent = `⭐ ${p.Total_Points||0} pts`;
+    document.getElementById('heroBMI').textContent = `📊 BMI: ${p.BMI||'–'}`;
+
+    // AVATAR
+    const avatars = {'Weight Loss':'🏃','Muscle Gain':'💪','Maintenance':'⚖️','Endurance':'🚴'};
+    document.getElementById('avatarEmoji').textContent = avatars[p.Fitness_Goal]||'💪';
+
+    // STATS
+    document.getElementById('sBMI').textContent = p.BMI||'–';
+    document.getElementById('sLevel').textContent = LEVELS[Math.min((p.Level_Status||1)-1, LEVELS.length-1)];
+    document.getElementById('sStreak').textContent = p.Streak_Days||0;
+    document.getElementById('sPoints').textContent = p.Total_Points||0;
+
+    // INFO VIEW
+    document.getElementById('infoName').textContent = p.Name||'–';
+    document.getElementById('infoAge').textContent = p.Age ? p.Age+' years' : '–';
+    document.getElementById('infoGender').textContent = p.Gender||'–';
+    document.getElementById('infoHeight').textContent = p.Height_cm ? p.Height_cm+' cm' : '–';
+    document.getElementById('infoWeight').textContent = p.Weight_kg ? p.Weight_kg+' kg' : '–';
+    document.getElementById('infoGoal').textContent = p.Fitness_Goal||'–';
+    document.getElementById('infoEmail').textContent = p.Email||'–';
+    document.getElementById('infoDate').textContent = p.Created_At ? new Date(p.Created_At).toLocaleDateString('en-IN',{year:'numeric',month:'long',day:'numeric'}) : '–';
+
+    // EDIT FIELDS
+    document.getElementById('pName').value = p.Name||'';
+    document.getElementById('pAge').value = p.Age||'';
+    document.getElementById('pGoal').value = p.Fitness_Goal||'';
+    document.getElementById('pHeight').value = p.Height_cm||'';
+    document.getElementById('pWeight').value = p.Weight_kg||'';
+
+    // TOGGLES
+    document.getElementById('togRest').checked = !!p.Rest_Mode;
+    document.getElementById('togInjury').checked = !!p.Is_Injured;
+
+    // BMI METER
+    const bmi = parseFloat(p.BMI)||0;
+    document.getElementById('bmiVal').textContent = bmi.toFixed(1);
+    let bmiColor, bmiText, bmiRange, bmiPos, bmiAdvice;
+    if (bmi < 18.5) { bmiColor='#9a7a00'; bmiText='Underweight'; bmiRange='< 18.5'; bmiPos=10; bmiAdvice='💡 Focus on nutritious calorie-dense foods!'; }
+    else if (bmi < 25) { bmiColor='#2d8a57'; bmiText='Normal ✅'; bmiRange='18.5 – 24.9'; bmiPos=35; bmiAdvice='🎉 Great! Keep up the good work!'; }
+    else if (bmi < 30) { bmiColor='#c0392b'; bmiText='Overweight'; bmiRange='25 – 29.9'; bmiPos=65; bmiAdvice='💪 Focus on cardio and balanced diet!'; }
+    else { bmiColor='#8b0000'; bmiText='Obese'; bmiRange='≥ 30'; bmiPos=85; bmiAdvice='🏥 Please consult a doctor for guidance!'; }
+    const lbl = document.getElementById('bmiLabel');
+    lbl.style.background = bmiColor+'22'; lbl.style.color = bmiColor;
+    lbl.textContent = bmiText;
+    document.getElementById('bmiRange').textContent = 'Range: '+bmiRange;
+    document.getElementById('bmiPtr').style.left = bmiPos+'%';
+    document.getElementById('bmiAdvice').textContent = bmiAdvice;
+    document.getElementById('bmiVal').style.color = bmiColor;
+
+  } catch(e) { console.error(e); }
+}
+
+async function loadBadges() {
+  try {
+    const res = await fetch(`${API}/badges`,{credentials:'include'});
+    const badges = await res.json();
+    document.getElementById('badgesFull').innerHTML = badges.map(b=>`
+      <div class="badge-full ${b.Earned?'earned':'locked'}">
+        <div class="bi">${BADGE_ICONS[b.Badge_Name]||'🏅'}</div>
+        <div class="bn">${b.Badge_Name}</div>
+        <div class="bd">${b.Points_Required} pts</div>
+      </div>
+    `).join('');
+  } catch(e){}
+}
+
+function toggleEdit() {
+  isEditMode = !isEditMode;
+  document.getElementById('viewMode').style.display = isEditMode ? 'none' : 'block';
+  document.getElementById('editMode').style.display = isEditMode ? 'block' : 'none';
+}
+
+async function saveProfile(btn) {
+  const body = {
+    name: document.getElementById('pName').value.trim(),
+    age: parseInt(document.getElementById('pAge').value),
+    fitness_goal: document.getElementById('pGoal').value,
+    height_cm: parseFloat(document.getElementById('pHeight').value),
+    weight_kg: parseFloat(document.getElementById('pWeight').value)
+  };
+  btn.textContent='Saving...'; btn.disabled=true;
+  try {
+    const res = await fetch(`${API}/profile`,{method:'PUT',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify(body)});
+    if (res.ok) {
+      showAlert('saveAlert','success','✅ Profile updated successfully!');
+      setTimeout(()=>{ toggleEdit(); loadProfile(); },1500);
+    } else showAlert('saveAlert','error','❌ Could not save. Try again!');
+  } catch(e){ showAlert('saveAlert','error','🔌 Server not reachable!'); }
+  btn.textContent='💾 Save Changes'; btn.disabled=false;
+}
+
+async function updateToggle() {
+  const body = {
+    rest_mode: document.getElementById('togRest').checked ? 1 : 0,
+    is_injured: document.getElementById('togInjury').checked ? 1 : 0
+  };
+  await fetch(`${API}/profile`,{method:'PUT',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify(body)});
+}
+
+// DELETE ACCOUNT
+function showDeleteModal() { document.getElementById('deleteModal').classList.add('show'); }
+function closeModal() { document.getElementById('deleteModal').classList.remove('show'); }
+
+async function confirmDelete() {
+  try {
+    const res = await fetch(`${API}/delete-account`,{method:'DELETE',credentials:'include'});
+    if (res.ok) {
+      alert('Your account has been deleted. Goodbye! ');
+      window.location.href = '/login';
+    }
+  } catch(e){ alert('Error deleting account. Try again!'); }
+}
+
+function showAlert(id,type,msg){ const e=document.getElementById(id); e.className=`alert ${type}`; e.textContent=msg; setTimeout(()=>e.style.display='none',3000); }
+async function logout(){ await fetch(`${API}/logout`,{method:'POST',credentials:'include'}); window.location.href='/login'; }
+
+loadProfile();
+loadBadges();
+</script>
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FitQuest — Exercise</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <script>(function(){var t=localStorage.getItem('fq_theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <style>
+    [data-theme="light"] { --bg:#fdf6ff; --card:#fff; --text:#3a2d5f; --light:#8a7aaa; --border:#ede8ff; --nav:#fff; --input:#fdfaff; --hover:#f5f0ff; --shadow:rgba(100,60,180,0.09); }
+    [data-theme="dark"]  { --bg:#1a1025; --card:#241836; --text:#e8deff; --light:#9a88cc; --border:#3d2d5f; --nav:#1e1430; --input:#2d1f45; --hover:#2d1f45; --shadow:rgba(0,0,0,0.35); }
+    :root { --pink:#ff6b9d; --purple:#c77dff; --blue:#72b7f5; --teal:#5ecfcf; --yellow:#ffd166; --green:#6bcb77; --orange:#ff9a3c; }
+    * { margin:0; padding:0; box-sizing:border-box; transition:background 0.3s,color 0.3s,border-color 0.3s; }
+    body { font-family:'Nunito',sans-serif; background:var(--bg); min-height:100vh; }
+
+    nav { background:var(--nav); border-bottom:2px solid var(--border); padding:0 28px; display:flex; align-items:center; justify-content:space-between; height:64px; position:sticky; top:0; z-index:100; box-shadow:0 2px 20px var(--shadow); }
+    .nav-brand { display:flex; align-items:center; gap:10px; text-decoration:none; }
+    .nav-brand-icon { width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg,var(--pink),var(--purple)); display:flex; align-items:center; justify-content:center; }
+    .nav-brand-icon svg { width:22px; height:22px; stroke:white; fill:none; stroke-width:2; stroke-linecap:round; }
+    .nav-title { font-family:'Fredoka One',cursive; font-size:24px; background:linear-gradient(135deg,var(--pink),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .nav-links { display:flex; gap:4px; }
+    .nav-link { padding:8px 14px; border-radius:10px; font-size:13px; font-weight:800; color:var(--light); text-decoration:none; transition:all 0.2s; display:flex; align-items:center; gap:6px; }
+    .nav-link svg { width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; }
+    .nav-link:hover,.nav-link.active { background:linear-gradient(135deg,var(--pink),var(--purple)); color:#fff; }
+    .btn-logout { padding:8px 14px; border:2px solid var(--border); border-radius:10px; background:transparent; font-family:'Nunito',sans-serif; font-size:13px; font-weight:800; color:var(--light); cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:6px; }
+    .btn-logout svg { width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; }
+    .btn-logout:hover { background:#fff0f3; color:var(--pink); border-color:var(--pink); }
+
+    main { max-width:1100px; margin:0 auto; padding:28px 20px; }
+
+    .page-header { background:linear-gradient(135deg,var(--orange),var(--pink)); border-radius:20px; padding:22px 28px; margin-bottom:26px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 8px 24px rgba(255,154,60,0.28); }
+    .page-header-text h2 { font-family:'Fredoka One',cursive; font-size:26px; color:#fff; }
+    .page-header-text p { color:rgba(255,255,255,0.85); font-size:13px; font-weight:600; margin-top:3px; }
+    .page-header-icon { width:56px; height:56px; background:rgba(255,255,255,0.2); border-radius:16px; display:flex; align-items:center; justify-content:center; animation:bounce 2s ease infinite; }
+    .page-header-icon svg { width:30px; height:30px; stroke:white; fill:none; stroke-width:2; stroke-linecap:round; }
+    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+    .rest-banner { background:rgba(255,209,102,0.12); border:2px solid rgba(255,209,102,0.4); border-radius:16px; padding:14px 18px; margin-bottom:18px; display:none; align-items:center; gap:12px; }
+    .rest-banner.show { display:flex; }
+    .rest-banner svg { width:20px; height:20px; stroke:#9a7a00; fill:none; stroke-width:2; stroke-linecap:round; flex-shrink:0; }
+    .rest-banner span { font-size:14px; font-weight:800; color:#9a7a00; }
+
+    .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+    .stat { background:var(--card); border-radius:18px; padding:18px; border:2px solid var(--border); text-align:center; transition:transform 0.2s; }
+    .stat:hover { transform:translateY(-3px); }
+    .stat-icon { width:44px; height:44px; border-radius:13px; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; }
+    .stat-icon svg { width:22px; height:22px; fill:none; stroke-width:2; stroke-linecap:round; }
+    .stat-val { font-family:'Fredoka One',cursive; font-size:26px; color:var(--text); }
+    .stat-label { font-size:11px; color:var(--light); font-weight:800; text-transform:uppercase; letter-spacing:0.5px; }
+
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
+    .card { background:var(--card); border-radius:20px; padding:22px; border:2px solid var(--border); }
+    .card-head { display:flex; align-items:center; gap:8px; margin-bottom:18px; }
+    .card-head svg { width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; }
+    .card-head h3 { font-family:'Fredoka One',cursive; font-size:18px; color:var(--text); }
+
+    .filter-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+    .filter-pill { padding:7px 14px; border-radius:99px; border:2px solid var(--border); font-size:12px; font-weight:800; color:var(--light); cursor:pointer; background:var(--card); transition:all 0.2s; }
+    .filter-pill:hover,.filter-pill.active { background:linear-gradient(135deg,var(--orange),var(--pink)); color:#fff; border-color:transparent; }
+
+    /* EXERCISE CARDS */
+    .exer-grid { display:grid; grid-template-columns:1fr; gap:10px; max-height:400px; overflow-y:auto; padding-right:4px; }
+    .exer-grid::-webkit-scrollbar { width:5px; }
+    .exer-grid::-webkit-scrollbar-track { background:var(--border); border-radius:99px; }
+    .exer-grid::-webkit-scrollbar-thumb { background:var(--orange); border-radius:99px; }
+    .exer-card { background:var(--input); border:2px solid var(--border); border-radius:14px; padding:14px; display:flex; align-items:center; justify-content:space-between; transition:all 0.2s; }
+    .exer-card:hover { border-color:var(--orange); background:var(--hover); transform:translateX(3px); }
+    .exer-left { display:flex; align-items:center; gap:12px; }
+    .exer-icon { width:44px; height:44px; border-radius:12px; background:rgba(255,154,60,0.12); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .exer-icon svg { width:22px; height:22px; stroke:var(--orange); fill:none; stroke-width:2; stroke-linecap:round; }
+    .exer-name { font-size:14px; font-weight:800; color:var(--text); margin-bottom:3px; }
+    .exer-meta { font-size:11px; color:var(--light); font-weight:700; display:flex; gap:10px; }
+    .intensity-badge { padding:3px 10px; border-radius:99px; font-size:11px; font-weight:800; }
+    .Low { background:rgba(107,203,119,0.15); color:var(--green); }
+    .Medium { background:rgba(255,209,102,0.15); color:#9a7a00; }
+    .High { background:rgba(255,107,157,0.15); color:var(--pink); }
+    .log-exer-btn { padding:8px 14px; border:none; border-radius:10px; background:linear-gradient(135deg,var(--orange),var(--pink)); color:#fff; font-family:'Nunito',sans-serif; font-size:12px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:5px; transition:transform 0.2s; flex-shrink:0; }
+    .log-exer-btn svg { width:13px; height:13px; stroke:white; fill:none; stroke-width:2.5; stroke-linecap:round; }
+    .log-exer-btn:hover { transform:scale(1.05); }
+
+    /* FORM */
+    .fg { margin-bottom:13px; }
+    .fg label { display:flex; align-items:center; gap:5px; font-size:11px; font-weight:800; color:var(--text); margin-bottom:5px; text-transform:uppercase; letter-spacing:0.5px; }
+    .fg label svg { width:13px; height:13px; stroke:var(--purple); fill:none; stroke-width:2; stroke-linecap:round; flex-shrink:0; }
+    .fg input,.fg select { width:100%; padding:10px 13px; border:2px solid var(--border); border-radius:12px; font-family:'Nunito',sans-serif; font-size:13px; font-weight:600; color:var(--text); background:var(--input); outline:none; transition:border-color 0.2s; appearance:none; }
+    .fg input:focus,.fg select:focus { border-color:var(--orange); background:var(--card); }
+    .frow { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .btn-add { width:100%; padding:12px; border:none; border-radius:13px; background:linear-gradient(135deg,var(--orange),var(--pink)); color:#fff; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; cursor:pointer; margin-top:4px; transition:transform 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .btn-add svg { width:16px; height:16px; stroke:white; fill:none; stroke-width:2.5; stroke-linecap:round; }
+    .btn-add:hover { transform:translateY(-2px); }
+
+    /* TIMER */
+    .timer-wrap { text-align:center; padding:10px 0; }
+    .timer-label { font-size:11px; font-weight:800; color:var(--light); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+    .timer-display { font-family:'Fredoka One',cursive; font-size:50px; color:var(--text); margin-bottom:16px; }
+    .timer-btns { display:flex; gap:8px; justify-content:center; }
+    .tbtn { padding:10px 20px; border:none; border-radius:12px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; cursor:pointer; transition:transform 0.2s; display:flex; align-items:center; gap:6px; }
+    .tbtn svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2.5; stroke-linecap:round; }
+    .tbtn:hover { transform:scale(1.05); }
+    .tbtn.start { background:linear-gradient(135deg,var(--green),var(--teal)); color:#fff; }
+    .tbtn.stop { background:linear-gradient(135deg,var(--pink),var(--purple)); color:#fff; }
+    .tbtn.reset { background:var(--hover); color:var(--light); border:2px solid var(--border); }
+
+    /* LOG TABLE */
+    .log-table { width:100%; border-collapse:collapse; }
+    .log-table th { font-size:11px; font-weight:800; color:var(--light); text-transform:uppercase; letter-spacing:0.5px; padding:8px 12px; text-align:left; border-bottom:2px solid var(--border); }
+    .log-table td { padding:11px 12px; font-size:13px; font-weight:700; color:var(--text); border-bottom:1px solid var(--border); }
+    .log-table tr:last-child td { border-bottom:none; }
+    .del-btn { background:none; border:none; cursor:pointer; display:flex; align-items:center; color:var(--light); transition:all 0.2s; }
+    .del-btn svg { width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; }
+    .del-btn:hover { color:var(--pink); transform:scale(1.2); }
+
+    .alert { padding:11px 14px; border-radius:12px; font-size:13px; font-weight:700; margin-bottom:13px; display:none; align-items:center; gap:8px; }
+    .alert svg { width:15px; height:15px; flex-shrink:0; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; }
+    .alert.success { background:#e8faf0; color:#2d8a57; border:2px solid #a8e6c0; display:flex; }
+    .alert.error { background:#fff0f3; color:#c0392b; border:2px solid #ffb3c1; display:flex; }
+
+    .empty-state { text-align:center; padding:28px; color:var(--light); font-weight:700; font-size:14px; }
+    .empty-state svg { width:40px; height:40px; stroke:var(--border); fill:none; stroke-width:1.5; stroke-linecap:round; margin-bottom:10px; }
+
+    @media(max-width:700px){ .grid2{grid-template-columns:1fr} .stats{grid-template-columns:1fr 1fr} }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="/dashboard">
+    <div class="nav-brand-icon"><svg viewBox="0 0 24 24"><path d="M6 4v16M18 4v16M3 8h3M18 8h3M3 16h3M18 16h3M6 12h12"/></svg></div>
+    <span class="nav-title">FitQuest</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="/dashboard"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</a>
+    <a class="nav-link" href="/diet"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/></svg>Diet</a>
+    <a class="nav-link active" href="/exercise"><svg viewBox="0 0 24 24"><path d="M6 4v16M18 4v16M3 8h3M18 8h3M3 16h3M18 16h3M6 12h12"/></svg>Exercise</a>
+    <a class="nav-link" href="/profile"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
+  </div>
+  <button class="btn-logout" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</button>
+</nav>
+
+<main>
+  <div class="page-header">
+    <div class="page-header-text">
+      <h2>Exercise Tracker</h2>
+      <p>Move your body — every workout brings you closer to your goal!</p>
+    </div>
+    <div class="page-header-icon">
+      <svg viewBox="0 0 24 24"><path d="M6 4v16M18 4v16M3 8h3M18 8h3M3 16h3M18 16h3M6 12h12"/></svg>
+    </div>
+  </div>
+
+  <div class="rest-banner" id="restBanner">
+    <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <span>Rest Mode is ON — showing only light and recovery exercises. Listen to your body!</span>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-icon" style="background:rgba(94,207,207,0.12)"><svg viewBox="0 0 24 24" style="stroke:var(--teal)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-val" id="statMin">0</div><div class="stat-label">Minutes Today</div></div>
+    <div class="stat"><div class="stat-icon" style="background:rgba(255,107,157,0.12)"><svg viewBox="0 0 24 24" style="stroke:var(--pink)"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="stat-val" id="statBurned">0</div><div class="stat-label">Calories Burned</div></div>
+    <div class="stat"><div class="stat-icon" style="background:rgba(107,203,119,0.12)"><svg viewBox="0 0 24 24" style="stroke:var(--green)"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="stat-val" id="statSessions">0</div><div class="stat-label">Sessions Today</div></div>
+    <div class="stat"><div class="stat-icon" style="background:rgba(199,125,255,0.12)"><svg viewBox="0 0 24 24" style="stroke:var(--purple)"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div><div class="stat-val" id="statPts">0</div><div class="stat-label">Total Points</div></div>
+  </div>
+
+  <div class="grid2">
+    <!-- EXERCISE LIST -->
+    <div class="card">
+      <div class="card-head" style="color:var(--orange)">
+        <svg viewBox="0 0 24 24"><path d="M6 4v16M18 4v16M3 8h3M18 8h3M3 16h3M18 16h3M6 12h12"/></svg>
+        <h3>Choose Exercise</h3>
+      </div>
+      <div class="filter-row">
+        <div class="filter-pill active" onclick="filterEx(this,'')">All</div>
+        <div class="filter-pill" onclick="filterEx(this,'Low')">Low</div>
+        <div class="filter-pill" onclick="filterEx(this,'Medium')">Medium</div>
+        <div class="filter-pill" onclick="filterEx(this,'High')">High</div>
+      </div>
+      <div class="exer-grid" id="exerGrid">
+        <div class="empty-state"><svg viewBox="0 0 24 24"><path d="M6 4v16M18 4v16M3 8h3M18 8h3M3 16h3M18 16h3M6 12h12"/></svg>Loading exercises...</div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div style="display:flex;flex-direction:column;gap:18px;">
+
+      <!-- TIMER -->
+      <div class="card">
+        <div class="card-head" style="color:var(--teal)">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <h3>Workout Timer</h3>
+        </div>
+        <div class="timer-wrap">
+          <div class="timer-label">Time Elapsed</div>
+          <div class="timer-display" id="timerDisplay">00:00</div>
+          <div class="timer-btns">
+            <button class="tbtn start" onclick="startTimer()"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Start</button>
+            <button class="tbtn stop" onclick="stopTimer()"><svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Pause</button>
+            <button class="tbtn reset" onclick="resetTimer()"><svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.41"/></svg>Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADD EXERCISE -->
+      <div class="card">
+        <div class="card-head" style="color:var(--purple)">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <h3>Add Exercise</h3>
+        </div>
+        <div class="alert" id="addAlert"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span></span></div>
+        <div class="fg"><label><svg viewBox="0 0 24 24"><path d="M6 4v16M18 4v16M3 8h3M18 8h3M3 16h3M18 16h3M6 12h12"/></svg>Exercise Name</label><input type="text" id="eName" placeholder="e.g. Running, Yoga..."/></div>
+        <div class="frow">
+          <div class="fg"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Duration (min)</label><input type="number" id="eDur" placeholder="30"/></div>
+          <div class="fg"><label><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Cal Burned</label><input type="number" id="eCal" placeholder="200"/></div>
+        </div>
+        <div class="frow">
+          <div class="fg"><label><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Intensity</label>
+            <select id="eIntensity"><option value="">Select</option><option value="Low">Low</option><option value="Medium">Medium</option><option value="High">High</option></select>
+          </div>
+          <div class="fg"><label><svg viewBox="0 0 24 24"><path d="M6 4v16M18 4v16M6 12h12"/></svg>Type</label>
+            <select id="eType"><option value="">Select</option><option value="Cardio">Cardio</option><option value="Strength">Strength</option><option value="Flexibility">Flexibility</option><option value="Rest">Rest</option></select>
+          </div>
+        </div>
+        <button class="btn-add" onclick="addExercise(this)"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Exercise</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TODAY'S LOG -->
+  <div class="card">
+    <div class="card-head" style="color:var(--yellow)">
+      <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      <h3>Today's Workout Log</h3>
+    </div>
+    <div id="todayLog">
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24"><path d="M6 4v16M18 4v16M3 8h3M18 8h3M3 16h3M18 16h3M6 12h12"/></svg>
+        No workouts logged yet today!
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const API = '/api';
+let allExercises = [], timerInterval = null, timerSecs = 0;
+let todayMin=0, todayBurned=0, todaySessions=0;
+
+const TYPE_ICONS = {
+  Cardio: '<svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  Strength: '<svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round"><path d="M6 4v16M18 4v16M3 8h3M18 8h3M3 16h3M18 16h3M6 12h12"/></svg>',
+  Flexibility: '<svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+  Rest: '<svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+};
+
+async function loadExercises() {
+  try {
+    const res = await fetch(`${API}/exercise`, {credentials:'include'});
+    if (res.status === 401) { window.location.href='/login'; return; }
+    if (!res.ok) {
+      document.getElementById('exerGrid').innerHTML='<div class="empty-state">Could not load exercises. Make sure Flask is running!</div>';
+      return;
+    }
+    allExercises = await res.json();
+    renderExercises(allExercises);
+    try {
+      const profileRes = await fetch(`${API}/profile`, {credentials:'include'});
+      if (profileRes.ok) {
+        const profile = await profileRes.json();
+        if (profile.Rest_Mode||profile.Is_Injured) document.getElementById('restBanner').classList.add('show');
+      }
+    } catch(e) {}
+  } catch(e) {
+    document.getElementById('exerGrid').innerHTML='<div class="empty-state">Server not reachable. Is Flask running?</div>';
+  }
+}
+
+function renderExercises(list) {
+  const grid = document.getElementById('exerGrid');
+  if (!list.length) { grid.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 4v16M18 4v16M3 8h3M18 8h3M3 16h3M18 16h3M6 12h12"/></svg>No exercises found!</div>'; return; }
+  grid.innerHTML = list.map(e=>`
+    <div class="exer-card">
+      <div class="exer-left">
+        <div class="exer-icon">${TYPE_ICONS[e.Exercise_Type]||TYPE_ICONS.Cardio}</div>
+        <div>
+          <div class="exer-name">${e.Exercise_Name}</div>
+          <div class="exer-meta">
+            <span>${e.Duration_min} min</span>
+            <span>${e.Calories_Burned} kcal</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <span class="intensity-badge ${e.Intensity}">${e.Intensity}</span>
+        <button class="log-exer-btn" onclick="logExercise(${e.Exercise_ID},${e.Duration_min},${e.Calories_Burned})">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Log
+        </button>
+      </div>
+    </div>`).join('');
+}
+
+function filterEx(el, intensity) {
+  document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  renderExercises(intensity ? allExercises.filter(e=>e.Intensity===intensity) : allExercises);
+}
+
+async function logExercise(exerId, dur, burned) {
+  try {
+    const res = await fetch(`${API}/log`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({exercise_id:exerId,exercise_duration_min:dur})});
+    if (res.ok) {
+      todayMin+=dur; todayBurned+=burned; todaySessions++;
+      document.getElementById('statMin').textContent=todayMin;
+      document.getElementById('statBurned').textContent=todayBurned;
+      document.getElementById('statSessions').textContent=todaySessions;
+      loadTodayLog(); loadPoints();
+    }
+  } catch(e) {}
+}
+
+async function loadTodayLog() {
+  try {
+    const today=new Date().toISOString().split('T')[0];
+    const res=await fetch(`${API}/log?start_date=${today}`,{credentials:'include'});
+    const logs=await res.json();
+    const exLogs=logs.filter(l=>l.Exercise_Name);
+    const el=document.getElementById('todayLog');
+    if (!exLogs.length) { el.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 4v16M18 4v16M3 8h3M18 8h3M3 16h3M18 16h3M6 12h12"/></svg>No workouts logged yet today!</div>'; return; }
+    el.innerHTML=`<table class="log-table"><tr><th>Exercise</th><th>Duration</th><th>Burned</th><th></th></tr>
+      ${exLogs.map(l=>`<tr>
+        <td>${l.Exercise_Name}</td>
+        <td style="color:var(--teal);font-weight:800">${l.Exercise_Duration_min} min</td>
+        <td style="color:var(--orange);font-family:'Fredoka One',cursive">${l.Calories_Burned} kcal</td>
+        <td><button class="del-btn" onclick="deleteLog(${l.Log_ID})"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg></button></td>
+      </tr>`).join('')}
+    </table>`;
+  } catch(e) {}
+}
+
+async function loadPoints(){ try{ const res=await fetch(`${API}/progress`,{credentials:'include'}); const d=await res.json(); document.getElementById('statPts').textContent=d.Total_Points||0; }catch(e){} }
+async function deleteLog(id){ await fetch(`${API}/log/${id}`,{method:'DELETE',credentials:'include'}); loadTodayLog(); }
+
+async function addExercise(btn){
+  const body={exercise_name:document.getElementById('eName').value.trim(),duration_min:parseInt(document.getElementById('eDur').value),calories_burned:parseFloat(document.getElementById('eCal').value),intensity:document.getElementById('eIntensity').value,exercise_type:document.getElementById('eType').value};
+  if (!body.exercise_name||!body.duration_min||!body.calories_burned||!body.intensity||!body.exercise_type) return showAlert('addAlert','error','Please fill all fields!');
+  btn.disabled=true;
+  try{ const res=await fetch(`${API}/exercise`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify(body)}); if(res.ok){showAlert('addAlert','success','Exercise added!');document.getElementById('eName').value='';loadExercises();} }catch(e){}
+  btn.disabled=false;
+}
+
+// TIMER
+function startTimer(){ if(timerInterval) return; timerInterval=setInterval(()=>{ timerSecs++; const m=String(Math.floor(timerSecs/60)).padStart(2,'0'); const s=String(timerSecs%60).padStart(2,'0'); document.getElementById('timerDisplay').textContent=`${m}:${s}`; },1000); }
+function stopTimer(){ clearInterval(timerInterval); timerInterval=null; }
+function resetTimer(){ stopTimer(); timerSecs=0; document.getElementById('timerDisplay').textContent='00:00'; }
+
+function showAlert(id,type,msg){ const e=document.getElementById(id); e.className=`alert ${type}`; e.querySelector('span').textContent=msg; setTimeout(()=>e.style.display='none',3000); }
+async function logout(){ await fetch(`${API}/logout`,{method:'POST',credentials:'include'}); window.location.href='/login'; }
+
+loadExercises(); loadTodayLog(); loadPoints();
+</script>
+</body>
+</html>

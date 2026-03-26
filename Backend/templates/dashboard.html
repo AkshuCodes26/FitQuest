@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FitQuest — Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <style>
+    /* ── THEME VARIABLES ── */
+    [data-theme="light"] {
+      --bg:#fdf6ff; --card:#ffffff; --text:#3a2d5f; --light:#8a7aaa;
+      --border:#ede8ff; --sidebar:#ffffff; --nav:#ffffff; --input:#fdfaff;
+      --hover:#f5f0ff; --shadow:rgba(100,60,180,0.10);
+    }
+    [data-theme="dark"] {
+      --bg:#1a1025; --card:#241836; --text:#e8deff; --light:#9a88cc;
+      --border:#3d2d5f; --sidebar:#1e1430; --nav:#1e1430; --input:#2d1f45;
+      --hover:#2d1f45; --shadow:rgba(0,0,0,0.4);
+    }
+
+    :root {
+      --pink:#ff6b9d; --purple:#c77dff; --blue:#72b7f5; --teal:#5ecfcf;
+      --yellow:#ffd166; --green:#6bcb77; --orange:#ff9a3c;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; transition:background 0.3s,color 0.3s,border-color 0.3s; }
+    body { font-family:'Nunito',sans-serif; background:var(--bg); min-height:100vh; display:flex; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width:260px; min-height:100vh; background:var(--sidebar);
+      border-right:2px solid var(--border); display:flex; flex-direction:column;
+      position:fixed; left:0; top:0; bottom:0; z-index:200;
+      box-shadow:4px 0 20px var(--shadow); transition:transform 0.3s ease;
+    }
+    .sidebar.collapsed { transform:translateX(-260px); }
+
+    .sidebar-brand {
+      padding:24px 20px 16px; display:flex; align-items:center; gap:12px;
+      border-bottom:2px solid var(--border);
+    }
+    .brand-icon { width:44px; height:44px; border-radius:14px; background:linear-gradient(135deg,var(--pink),var(--purple)); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+    .brand-name { font-family:'Fredoka One',cursive; font-size:24px; background:linear-gradient(135deg,var(--pink),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+
+    /* USER CARD IN SIDEBAR */
+    .sidebar-user {
+      margin:16px 12px; padding:14px; border-radius:16px;
+      background:linear-gradient(135deg,rgba(199,125,255,0.15),rgba(255,107,157,0.15));
+      border:2px solid var(--border); text-align:center;
+    }
+    .sidebar-avatar { width:54px; height:54px; border-radius:50%; background:linear-gradient(135deg,var(--pink),var(--purple)); display:flex; align-items:center; justify-content:center; font-size:26px; margin:0 auto 8px; }
+    .sidebar-username { font-size:14px; font-weight:800; color:var(--text); }
+    .sidebar-level { font-size:12px; color:var(--light); font-weight:700; margin-top:2px; }
+    .sidebar-pts { display:inline-block; margin-top:6px; padding:3px 12px; background:linear-gradient(135deg,var(--yellow),var(--orange)); border-radius:99px; font-size:11px; font-weight:800; color:#fff; }
+
+    /* NAV ITEMS */
+    .sidebar-nav { flex:1; padding:8px 12px; overflow-y:auto; }
+    .nav-section { font-size:10px; font-weight:800; color:var(--light); text-transform:uppercase; letter-spacing:1px; padding:12px 8px 6px; }
+    .nav-item {
+      display:flex; align-items:center; gap:12px; padding:12px 14px;
+      border-radius:14px; cursor:pointer; transition:all 0.2s; color:var(--light);
+      font-size:14px; font-weight:700; text-decoration:none; margin-bottom:2px;
+    }
+    .nav-item:hover { background:var(--hover); color:var(--text); }
+    .nav-item.active { background:linear-gradient(135deg,rgba(199,125,255,0.2),rgba(255,107,157,0.2)); color:var(--purple); border:1px solid rgba(199,125,255,0.3); }
+    .nav-item .nav-icon { font-size:20px; width:28px; text-align:center; flex-shrink:0; }
+    .nav-item .nav-badge { margin-left:auto; background:var(--pink); color:#fff; font-size:10px; font-weight:800; padding:2px 7px; border-radius:99px; }
+
+    /* SETTINGS SUBMENU */
+    .submenu { display:none; padding-left:16px; }
+    .submenu.open { display:block; }
+    .submenu .nav-item { font-size:13px; padding:9px 14px; }
+
+    /* THEME TOGGLE IN SIDEBAR */
+    .theme-toggle-row {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 14px; border-radius:14px; margin-bottom:2px;
+    }
+    .theme-toggle-label { display:flex; align-items:center; gap:12px; font-size:14px; font-weight:700; color:var(--light); }
+    .theme-switch { position:relative; width:46px; height:24px; flex-shrink:0; }
+    .theme-switch input { opacity:0; width:0; height:0; }
+    .theme-slider { position:absolute; cursor:pointer; inset:0; background:var(--border); border-radius:99px; transition:0.3s; }
+    .theme-slider::before { content:''; position:absolute; height:18px; width:18px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:0.3s; }
+    input:checked + .theme-slider { background:linear-gradient(135deg,var(--purple),var(--pink)); }
+    input:checked + .theme-slider::before { transform:translateX(22px); }
+
+    /* SIDEBAR BOTTOM */
+    .sidebar-bottom { padding:12px; border-top:2px solid var(--border); }
+    .btn-logout-side {
+      width:100%; padding:12px; border:2px solid var(--border); border-radius:14px;
+      background:transparent; font-family:'Nunito',sans-serif; font-size:14px;
+      font-weight:800; color:var(--light); cursor:pointer; display:flex; align-items:center;
+      justify-content:center; gap:8px; transition:all 0.2s;
+    }
+    .btn-logout-side:hover { background:#fff0f3; color:var(--pink); border-color:var(--pink); }
+
+    /* ── MAIN CONTENT ── */
+    .main-wrap { margin-left:260px; width:calc(100% - 260px); flex:1; transition:margin-left 0.3s, width 0.3s; min-height:100vh; }
+
+    /* TOP BAR */
+    .topbar {
+      background:var(--nav); border-bottom:2px solid var(--border);
+      padding:0 24px; height:65px; display:flex; align-items:center;
+      justify-content:space-between; position:sticky; top:0; z-index:100;
+      box-shadow:0 2px 20px var(--shadow);
+    }
+    .topbar-left { display:flex; align-items:center; gap:14px; }
+    .hamburger { background:none; border:none; cursor:pointer; font-size:22px; color:var(--text); padding:8px; border-radius:10px; transition:background 0.2s; }
+    .hamburger:hover { background:var(--hover); }
+    .topbar-title { font-family:'Fredoka One',cursive; font-size:20px; color:var(--text); }
+    .topbar-right { display:flex; align-items:center; gap:10px; }
+    .topbar-greeting { font-size:13px; font-weight:800; color:var(--light); }
+    .topbar-greeting span { color:var(--text); }
+
+    /* CONTENT PANELS */
+    .panel { display:none; padding:24px; }
+    .panel.active { display:block; }
+
+    /* MOTIVATION BAR */
+    .motiv { background:linear-gradient(135deg,var(--pink),var(--purple)); border-radius:18px; padding:18px 24px; margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 8px 24px rgba(199,125,255,0.3); }
+    .motiv-text { font-size:15px; font-weight:800; color:#fff; }
+    .motiv-emoji { font-size:28px; animation:pulse 1.5s ease infinite; }
+    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
+
+    /* STAT CARDS */
+    .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+    .stat { background:var(--card); border-radius:20px; padding:20px; border:2px solid var(--border); text-align:center; transition:transform 0.2s,box-shadow 0.2s; }
+    .stat:hover { transform:translateY(-4px); box-shadow:0 12px 30px var(--shadow); }
+    .stat-icon { font-size:32px; margin-bottom:8px; }
+    .stat-val { font-family:'Fredoka One',cursive; font-size:30px; color:var(--text); }
+    .stat-label { font-size:12px; color:var(--light); font-weight:800; text-transform:uppercase; letter-spacing:0.5px; margin-top:3px; }
+
+    /* CARDS */
+    .grid2 { display:grid; grid-template-columns:2fr 1fr; gap:20px; margin-bottom:20px; }
+    .grid2b { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
+    .card { background:var(--card); border-radius:20px; padding:22px; border:2px solid var(--border); }
+    .card-head { display:flex; align-items:center; gap:8px; margin-bottom:18px; }
+    .card-head h3 { font-family:'Fredoka One',cursive; font-size:18px; color:var(--text); }
+    .dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+
+    /* LEVEL */
+    .level-center { text-align:center; }
+    .level-badge { width:90px; height:90px; border-radius:50%; margin:0 auto 12px; background:linear-gradient(135deg,var(--yellow),var(--orange)); display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(255,166,60,0.4); animation:bounce 2s ease infinite; }
+    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+    .level-num { font-family:'Fredoka One',cursive; font-size:30px; color:#fff; line-height:1; }
+    .level-word { font-size:11px; color:rgba(255,255,255,0.9); font-weight:800; }
+    .level-title { font-family:'Fredoka One',cursive; font-size:20px; color:var(--text); margin-bottom:4px; }
+    .level-pts { font-size:13px; color:var(--light); font-weight:700; }
+
+    /* PROGRESS BARS */
+    .prog-row { display:flex; justify-content:space-between; font-size:13px; font-weight:700; color:var(--text); margin-bottom:5px; }
+    .prog-track { background:var(--border); border-radius:99px; height:12px; margin-bottom:14px; overflow:hidden; }
+    .prog-fill { height:100%; border-radius:99px; transition:width 1.2s ease; }
+
+    /* LOG FORM */
+    .log-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .fg label { display:block; font-size:11px; font-weight:800; color:var(--text); margin-bottom:5px; text-transform:uppercase; letter-spacing:0.5px; }
+    .fg input,.fg select { width:100%; padding:10px 13px; border:2px solid var(--border); border-radius:12px; font-family:'Nunito',sans-serif; font-size:13px; font-weight:600; color:var(--text); background:var(--input); outline:none; transition:border-color 0.2s; appearance:none; }
+    .fg input:focus,.fg select:focus { border-color:var(--purple); }
+    .fg.full { grid-column:1/-1; }
+    .btn-log { grid-column:1/-1; padding:13px; border:none; border-radius:13px; background:linear-gradient(135deg,var(--teal),var(--blue)); color:#fff; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; cursor:pointer; transition:transform 0.2s; }
+    .btn-log:hover { transform:translateY(-2px); }
+
+    /* BADGES */
+    .badges-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .badge-item { text-align:center; padding:12px 8px; border-radius:14px; border:2px solid var(--border); transition:transform 0.2s; }
+    .badge-item:hover { transform:scale(1.05); }
+    .badge-item.earned { background:linear-gradient(135deg,#fff8e0,#fff0c0); border-color:var(--yellow); }
+    .badge-item.locked { opacity:0.4; filter:grayscale(1); }
+    .badge-icon { font-size:26px; margin-bottom:4px; }
+    .badge-name { font-size:10px; font-weight:800; color:var(--text); }
+
+    /* TIPS */
+    .tips-list { list-style:none; }
+    .tips-list li { display:flex; gap:10px; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--border); font-size:13px; color:var(--text); font-weight:600; }
+    .tips-list li:last-child { border-bottom:none; }
+
+    /* ALERT */
+    .alert { padding:11px 14px; border-radius:12px; font-size:13px; font-weight:700; margin-bottom:12px; display:none; }
+    .alert.success { background:#e8faf0; color:#2d8a57; border:2px solid #a8e6c0; display:block; }
+    .alert.error { background:#fff0f3; color:#c0392b; border:2px solid #ffb3c1; display:block; }
+
+    /* SETTINGS PANEL */
+    .settings-section { background:var(--card); border-radius:20px; padding:22px; border:2px solid var(--border); margin-bottom:20px; }
+    .settings-section h3 { font-family:'Fredoka One',cursive; font-size:18px; color:var(--text); margin-bottom:16px; }
+    .setting-row { display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--border); }
+    .setting-row:last-child { border-bottom:none; }
+    .setting-info h4 { font-size:14px; font-weight:800; color:var(--text); }
+    .setting-info p { font-size:12px; color:var(--light); font-weight:600; margin-top:2px; }
+    .toggle { position:relative; width:48px; height:26px; flex-shrink:0; }
+    .toggle input { opacity:0; width:0; height:0; }
+    .slider { position:absolute; cursor:pointer; inset:0; background:var(--border); border-radius:99px; transition:0.3s; }
+    .slider::before { content:''; position:absolute; height:20px; width:20px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:0.3s; }
+    input:checked + .slider { background:linear-gradient(135deg,var(--pink),var(--purple)); }
+    input:checked + .slider::before { transform:translateX(22px); }
+
+    /* SCORE CARD */
+    .score-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:20px; }
+    .score-card { background:var(--card); border-radius:18px; padding:18px; border:2px solid var(--border); text-align:center; }
+    .score-val { font-family:'Fredoka One',cursive; font-size:28px; margin-bottom:4px; }
+    .score-label { font-size:12px; color:var(--light); font-weight:800; text-transform:uppercase; }
+
+    /* DANGER ZONE */
+    .danger-zone { background:rgba(255,107,107,0.08); border:2px solid #ffb3c1; border-radius:20px; padding:22px; }
+    .danger-zone h3 { font-family:'Fredoka One',cursive; font-size:18px; color:#c0392b; margin-bottom:8px; }
+    .danger-zone p { font-size:13px; color:#c0392b; font-weight:600; margin-bottom:16px; }
+    .btn-danger { padding:12px 24px; border:2px solid #c0392b; border-radius:12px; background:transparent; color:#c0392b; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; cursor:pointer; transition:all 0.2s; }
+    .btn-danger:hover { background:#c0392b; color:#fff; }
+
+    /* DATA TABLE */
+    .data-table { width:100%; border-collapse:collapse; }
+    .data-table th { font-size:11px; font-weight:800; color:var(--light); text-transform:uppercase; letter-spacing:0.5px; padding:10px 14px; text-align:left; border-bottom:2px solid var(--border); }
+    .data-table td { padding:12px 14px; font-size:13px; font-weight:700; color:var(--text); border-bottom:1px solid var(--border); }
+    .data-table tr:last-child td { border-bottom:none; }
+    .data-table tr:hover td { background:var(--hover); }
+
+    /* PERIOD TABS */
+    .period-tabs { display:flex; gap:8px; margin-bottom:20px; }
+    .period-tab { padding:9px 20px; border-radius:99px; border:2px solid var(--border); font-size:13px; font-weight:800; color:var(--light); cursor:pointer; background:var(--card); transition:all 0.2s; }
+    .period-tab.active { background:linear-gradient(135deg,var(--pink),var(--purple)); color:#fff; border-color:transparent; }
+
+    /* STREAK */
+    .streak-info { text-align:center; margin-top:14px; font-size:13px; font-weight:800; color:var(--light); }
+    .streak-info span { color:var(--orange); font-family:'Fredoka One',cursive; font-size:18px; }
+
+    /* MODAL */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:999; display:none; align-items:center; justify-content:center; }
+    .modal-overlay.show { display:flex; }
+    .modal { background:var(--card); border-radius:24px; padding:32px; max-width:400px; width:90%; text-align:center; animation:popIn 0.3s ease; }
+    @keyframes popIn { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
+    .modal h3 { font-family:'Fredoka One',cursive; font-size:24px; color:var(--text); margin-bottom:8px; }
+    .modal p { font-size:14px; color:var(--light); font-weight:600; margin-bottom:20px; }
+    .modal-btns { display:flex; gap:10px; }
+    .btn-cancel { flex:1; padding:12px; border:2px solid var(--border); border-radius:12px; background:transparent; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; color:var(--light); cursor:pointer; }
+    .btn-confirm { flex:1; padding:12px; border:none; border-radius:12px; background:linear-gradient(135deg,#ff6b6b,#c0392b); color:#fff; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; cursor:pointer; }
+
+    /* SIDEBAR OVERLAY for mobile */
+    .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:199; }
+    .sidebar-overlay.show { display:block; }
+
+    @media(max-width:900px){
+      .stats{grid-template-columns:1fr 1fr}
+      .grid2,.grid2b{grid-template-columns:1fr}
+      .score-grid{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:600px){
+      .sidebar{ transform:translateX(-260px); }
+      .sidebar.open{ transform:translateX(0); }
+      .main-wrap{ margin-left:0 !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- DELETE MODAL -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div style="font-size:48px;margin-bottom:12px">⚠️</div>
+    <h3>Delete Account?</h3>
+    <p>This will permanently delete your account, all logs, progress and badges. This cannot be undone!</p>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-confirm" onclick="confirmDelete()">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR OVERLAY (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- ── SIDEBAR ── -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">🏋️</div>
+    <span class="brand-name">FitQuest</span>
+  </div>
+
+  <!-- USER CARD -->
+  <div class="sidebar-user">
+    <div class="sidebar-avatar" id="sAvatar">💪</div>
+    <div class="sidebar-username" id="sName">Loading...</div>
+    <div class="sidebar-level" id="sLevelText">Level 1 — Beginner</div>
+    <div class="sidebar-pts" id="sPtsText">0 pts</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- MAIN -->
+    <div class="nav-section">Main</div>
+    <div class="nav-item active" onclick="showPanel('dashboard',this)">
+      <span class="nav-icon">🏠</span> Dashboard
+    </div>
+    <a class="nav-item" href="/diet">
+      <span class="nav-icon">🥗</span> Diet Tracker
+    </a>
+    <a class="nav-item" href="/exercise">
+      <span class="nav-icon">💪</span> Exercise
+    </a>
+    <div class="nav-item" onclick="showPanel('profile',this)">
+      <span class="nav-icon">👤</span> My Profile
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="nav-section">Progress</div>
+    <div class="nav-item" onclick="showPanel('scores',this)">
+      <span class="nav-icon">⭐</span> My Scores
+    </div>
+    <div class="nav-item" onclick="showPanel('weekly',this)">
+      <span class="nav-icon">📅</span> Weekly Data
+    </div>
+    <div class="nav-item" onclick="showPanel('monthly',this)">
+      <span class="nav-icon">📊</span> Monthly Data
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="nav-section">Settings</div>
+    <div class="nav-item" onclick="toggleSubmenu()">
+      <span class="nav-icon">⚙️</span> Settings
+      <span id="settingsArrow" style="margin-left:auto;transition:transform 0.3s">▾</span>
+    </div>
+    <div class="submenu" id="settingsSubmenu">
+      <!-- DARK MODE TOGGLE -->
+      <div class="theme-toggle-row">
+        <div class="theme-toggle-label">
+          <span style="font-size:20px;width:28px;text-align:center">🌙</span> Dark Mode
+        </div>
+        <label class="theme-switch">
+          <input type="checkbox" id="darkToggle" onchange="toggleTheme()"/>
+          <span class="theme-slider"></span>
+        </label>
+      </div>
+      <div class="nav-item" onclick="showPanel('settings',this)">
+        <span class="nav-icon">🔔</span> Preferences
+      </div>
+    </div>
+
+    <!-- ACCOUNT -->
+    <div class="nav-section">Account</div>
+    <div class="nav-item" onclick="confirmLogout()">
+      <span class="nav-icon">🚪</span> Logout
+    </div>
+    <div class="nav-item" style="color:#ff6b6b" onclick="showDeleteModal()">
+      <span class="nav-icon">🗑️</span> Delete Account
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN CONTENT ── -->
+<div class="main-wrap" id="mainWrap">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-greeting">Hey, <span id="topName">Champion</span>! 👋</div>
+    </div>
+  </div>
+
+  <!-- ══ DASHBOARD PANEL ══ -->
+  <div class="panel active" id="panel-dashboard">
+    <div class="motiv">
+      <div class="motiv-text" id="motivMsg">💪 You're doing amazing! Keep pushing!</div>
+      <div class="motiv-emoji">🔥</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="stat-icon">🔥</div><div class="stat-val" id="sCal">0</div><div class="stat-label">Calories Today</div></div>
+      <div class="stat"><div class="stat-icon">💧</div><div class="stat-val" id="sWater">0L</div><div class="stat-label">Water Today</div></div>
+      <div class="stat"><div class="stat-icon">⏱️</div><div class="stat-val" id="sExer">0</div><div class="stat-label">Exercise (min)</div></div>
+      <div class="stat"><div class="stat-icon">⭐</div><div class="stat-val" id="sPts">0</div><div class="stat-label">Total Points</div></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="card-head"><div class="dot" style="background:var(--pink)"></div><h3>Calories This Month 📊</h3></div>
+        <canvas id="calChart" height="180"></canvas>
+        <div id="chartEmpty" style="text-align:center;padding:40px;color:var(--light);font-weight:700;display:none"><div style="font-size:36px;margin-bottom:8px">📊</div>Log activities to see chart!</div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="dot" style="background:var(--yellow)"></div><h3>Your Level 🏆</h3></div>
+        <div class="level-center">
+          <div class="level-badge"><div class="level-num" id="levelNum">1</div><div class="level-word">LEVEL</div></div>
+          <div class="level-title" id="levelTitle">Beginner</div>
+          <div class="level-pts" id="levelPts">0 / 1000 pts</div>
+        </div>
+        <div style="margin-top:16px">
+          <div class="prog-row"><span>XP Progress</span><span id="xpPct">0%</span></div>
+          <div class="prog-track"><div class="prog-fill" id="xpBar" style="width:0%;background:linear-gradient(90deg,var(--yellow),var(--orange))"></div></div>
+        </div>
+        <div class="streak-info">🔥 Streak: <span id="streakNum">0</span> days</div>
+      </div>
+    </div>
+
+    <div class="grid2b">
+      <div class="card">
+        <div class="card-head"><div class="dot" style="background:var(--teal)"></div><h3>Log Today's Activity ✍️</h3></div>
+        <div class="alert" id="logAlert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:15px;height:15px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span></span></div>
+        <div class="log-grid">
+          <div class="fg"><label>Food</label><select id="logDiet"><option value="">Select food...</option></select></div>
+          <div class="fg"><label>Exercise</label><select id="logExer"><option value="">Select exercise...</option></select></div>
+          <div class="fg"><label>Calories (kcal)</label><input type="number" id="logCal" placeholder="e.g. 350" oninput="updateCalDisplay()"/></div>
+          <div class="fg"><label>Water (L)</label><input type="number" step="0.1" id="logWater" placeholder="e.g. 2.5" oninput="updateProgress()"/></div>
+          <div class="fg"><label>Exercise (min)</label><input type="number" id="logDur" placeholder="e.g. 30" oninput="updateProgress()"/></div>
+          <div class="fg"><label>📝 Notes</label><input type="text" id="logNotes" placeholder="How do you feel?"/></div>
+          <button class="btn-log" id="logBtn" onclick="logActivity()">✅ Log Activity (+50 pts)</button>
+        </div>
+        <div style="margin-top:20px">
+          <div class="prog-row"><span>Hydration (<span id="waterGoalLabel">2.5</span>L)</span><span id="hydPct">0%</span></div>
+          <div class="prog-track"><div class="prog-fill" id="hydBar" style="width:0%;background:linear-gradient(90deg,var(--blue),var(--teal))"></div></div>
+          <div class="prog-row"><span>Exercise (<span id="exGoalLabel">30</span> min)</span><span id="exPct">0%</span></div>
+          <div class="prog-track"><div class="prog-fill" id="exBar" style="width:0%;background:linear-gradient(90deg,var(--green),var(--teal))"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="dot" style="background:var(--purple)"></div><h3>My Badges 🏅</h3></div>
+        <div class="badges-grid" id="badgesGrid"><div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--light);font-weight:700">Loading...</div></div>
+        <div style="margin-top:16px;background:var(--hover);border-radius:14px;padding:14px;text-align:center">
+          <div style="font-size:11px;font-weight:800;color:var(--light);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Your BMI</div>
+          <div style="font-family:'Fredoka One',cursive;font-size:30px;color:var(--text)" id="bmiQuick">–</div>
+          <div style="font-size:13px;font-weight:800;margin-top:2px" id="bmiStatusQuick">–</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="dot" style="background:var(--green)"></div><h3>Today's Wellness Tips 💡</h3></div>
+      <ul class="tips-list">
+        <li><span style="font-size:20px">🥤</span>Drink a glass of water first thing in the morning to kickstart your metabolism!</li>
+        <li><span style="font-size:20px">🚶</span>Even a 10-minute walk after meals can significantly improve blood sugar levels.</li>
+        <li><span style="font-size:20px">😴</span>Getting 7-8 hours of sleep is just as important as your workout — rest and grow!</li>
+        <li><span style="font-size:20px">🥗</span>Fill half your plate with vegetables at every meal for optimal nutrition.</li>
+        <li><span style="font-size:20px">🧘</span>Take 5 minutes to breathe deeply — stress management is part of fitness too!</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══ PROFILE PANEL ══ -->
+  <div class="panel" id="panel-profile">
+    <div style="background:linear-gradient(135deg,var(--purple),var(--pink));border-radius:20px;padding:28px;margin-bottom:24px;display:flex;align-items:center;gap:20px;box-shadow:0 8px 30px rgba(199,125,255,0.3)">
+      <div style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.25);border:3px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;font-size:40px" id="profileAvatar">💪</div>
+      <div>
+        <div style="font-family:'Fredoka One',cursive;font-size:28px;color:#fff" id="profileName">–</div>
+        <div style="color:rgba(255,255,255,0.85);font-size:14px;font-weight:600" id="profileEmail">–</div>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <span style="padding:5px 12px;background:rgba(255,255,255,0.2);border-radius:99px;font-size:12px;font-weight:800;color:#fff" id="profileGoal">–</span>
+          <span style="padding:5px 12px;background:rgba(255,255,255,0.2);border-radius:99px;font-size:12px;font-weight:800;color:#fff" id="profileBMIBadge">BMI: –</span>
+        </div>
+      </div>
+    </div>
+    <div class="grid2b">
+      <div class="card">
+        <div class="card-head"><div class="dot" style="background:var(--purple)"></div><h3>Profile Info 👤</h3></div>
+        <div id="profileInfoRows"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="dot" style="background:var(--blue)"></div><h3>BMI Status 📊</h3></div>
+        <div style="text-align:center;padding:10px 0">
+          <div style="font-family:'Fredoka One',cursive;font-size:48px;color:var(--text)" id="pBMIVal">–</div>
+          <div style="font-size:14px;font-weight:800;padding:6px 18px;border-radius:99px;display:inline-block;margin:8px 0" id="pBMILabel">–</div>
+          <div style="background:linear-gradient(90deg,#72b7f5,#6bcb77,#ffd166,#ff9a3c,#ff6b9d);border-radius:99px;height:10px;margin:10px 0;position:relative">
+            <div style="position:absolute;top:-4px;width:18px;height:18px;background:#fff;border:3px solid var(--text);border-radius:50%;transform:translateX(-50%);transition:left 1s ease" id="pBMIPtr"></div>
+          </div>
+          <div style="font-size:13px;font-weight:700;color:var(--light);margin-top:8px" id="pBMIAdvice">–</div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:8px">
+      <a href="/profile" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border-radius:14px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;text-decoration:none">✏️ Edit Full Profile</a>
+    </div>
+  </div>
+
+  <!-- ══ SCORES PANEL ══ -->
+  <div class="panel" id="panel-scores">
+    <div style="font-family:'Fredoka One',cursive;font-size:28px;color:var(--text);margin-bottom:20px">My Scores ⭐</div>
+    <div class="score-grid">
+      <div class="score-card"><div class="score-val" style="color:var(--purple)" id="sc_points">0</div><div class="score-label">Total Points</div></div>
+      <div class="score-card"><div class="score-val" style="color:var(--yellow)" id="sc_level">1</div><div class="score-label">Current Level</div></div>
+      <div class="score-card"><div class="score-val" style="color:var(--orange)" id="sc_streak">0</div><div class="score-label">Day Streak</div></div>
+      <div class="score-card"><div class="score-val" style="color:var(--green)" id="sc_badges">0</div><div class="score-label">Badges Earned</div></div>
+      <div class="score-card"><div class="score-val" style="color:var(--blue)" id="sc_bmi">–</div><div class="score-label">BMI</div></div>
+      <div class="score-card"><div class="score-val" style="color:var(--pink)" id="sc_next">1000</div><div class="score-label">Pts to Next Level</div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="dot" style="background:var(--yellow)"></div><h3>All Badges 🏅</h3></div>
+      <div class="badges-grid" id="scoresAllBadges"></div>
+    </div>
+  </div>
+
+  <!-- ══ WEEKLY PANEL ══ -->
+  <div class="panel" id="panel-weekly">
+    <div style="font-family:'Fredoka One',cursive;font-size:28px;color:var(--text);margin-bottom:20px">Weekly Data 📅</div>
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-head"><div class="dot" style="background:var(--pink)"></div><h3>This Week's Calories 🔥</h3></div>
+      <canvas id="weeklyChart" height="160"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="dot" style="background:var(--blue)"></div><h3>Hydration This Week 💧</h3></div>
+      <canvas id="hydrationChart" height="140"></canvas>
+    </div>
+  </div>
+
+  <!-- ══ MONTHLY PANEL ══ -->
+  <div class="panel" id="panel-monthly">
+    <div style="font-family:'Fredoka One',cursive;font-size:28px;color:var(--text);margin-bottom:20px">Monthly Data 📊</div>
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-head"><div class="dot" style="background:var(--purple)"></div><h3>Monthly Progress 📈</h3></div>
+      <canvas id="monthlyChart" height="180"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="dot" style="background:var(--green)"></div><h3>Activity Log This Month 📋</h3></div>
+      <div id="monthlyTable"><div style="text-align:center;padding:20px;color:var(--light);font-weight:700">Loading...</div></div>
+    </div>
+  </div>
+
+  <!-- ══ SETTINGS PANEL ══ -->
+  <div class="panel" id="panel-settings">
+    <div style="font-family:'Fredoka One',cursive;font-size:28px;color:var(--text);margin-bottom:20px">Settings ⚙️</div>
+
+    <div class="settings-section">
+      <h3>🎨 Appearance</h3>
+      <div class="setting-row">
+        <div class="setting-info"><h4>🌙 Dark Mode</h4><p>Switch between light and dark theme</p></div>
+        <label class="toggle"><input type="checkbox" id="darkToggle2" onchange="toggleTheme2()"/><span class="slider"></span></label>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>🏥 Health Settings</h3>
+      <div class="setting-row">
+        <div class="setting-info"><h4>😴 Rest Mode</h4><p>Skip intense workouts today</p></div>
+        <label class="toggle"><input type="checkbox" id="settingsRest" onchange="updateHealthSettings()"/><span class="slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info"><h4>🤕 Injury Mode</h4><p>Only show safe, low intensity exercises</p></div>
+        <label class="toggle"><input type="checkbox" id="settingsInjury" onchange="updateHealthSettings()"/><span class="slider"></span></label>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>🎯 Daily Goals</h3>
+      <div class="setting-row">
+        <div class="setting-info"><h4>💧 Water Goal</h4><p>Target: 2.5 litres per day</p></div>
+        <span style="font-family:'Fredoka One',cursive;font-size:18px;color:var(--blue)">2.5L</span>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info"><h4>⏱️ Exercise Goal</h4><p>Target: 30 minutes per day</p></div>
+        <span style="font-family:'Fredoka One',cursive;font-size:18px;color:var(--green)">30 min</span>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info"><h4>🔥 Calorie Goal</h4><p>Based on your fitness goal</p></div>
+        <span style="font-family:'Fredoka One',cursive;font-size:18px;color:var(--orange)" id="calGoalDisplay">–</span>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>ℹ️ About</h3>
+      <div class="setting-row"><div class="setting-info"><h4>App Version</h4><p>FitQuest v1.0</p></div><span style="color:var(--light);font-weight:700">v1.0</span></div>
+      <div class="setting-row"><div class="setting-info"><h4>Developed By</h4><p>Aksharaa D & Anamika S</p></div><span style="font-size:18px">👩‍💻</span></div>
+    </div>
+
+    <div class="danger-zone">
+      <h3>⚠️ Danger Zone</h3>
+      <p>Permanently delete your account and all data. This cannot be undone!</p>
+      <button class="btn-danger" onclick="showDeleteModal()">🗑️ Delete My Account</button>
+    </div>
+  </div>
+
+</div><!-- end main-wrap -->
+
+<script>
+const API = '/api';
+const MOTIVS = ['💪 You\'re doing amazing! Keep pushing — every rep counts!','🌟 Consistency is your superpower. Show up today!','🔥 Small steps every day lead to BIG results!','🏆 Champions are made in moments they want to quit but don\'t!','✨ You\'re one workout away from a good mood. Let\'s go!'];
+const LEVELS = ['Beginner','Rookie','Warrior','Champion','Legend','Grand Master'];
+const BADGE_ICONS = {'7-Day Consistency':'🗓️','Calorie Control Champion':'🥗','Hydration Hero':'💧','First Step':'👟','Streak Master':'🔥'};
+const GOAL_CALS = {'Weight Loss':'1500 kcal','Muscle Gain':'2500 kcal','Maintenance':'2000 kcal','Endurance':'2200 kcal'};
+
+document.getElementById('motivMsg').textContent = MOTIVS[Math.floor(Math.random()*MOTIVS.length)];
+
+// ── THEME
+function toggleTheme() {
+  const isDark = document.getElementById('darkToggle').checked;
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('darkToggle2').checked = isDark;
+  localStorage.setItem('fq_theme', isDark ? 'dark' : 'light');
+}
+function toggleTheme2() {
+  const isDark = document.getElementById('darkToggle2').checked;
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('darkToggle').checked = isDark;
+  localStorage.setItem('fq_theme', isDark ? 'dark' : 'light');
+}
+// Load saved theme
+const savedTheme = localStorage.getItem('fq_theme') || 'light';
+document.documentElement.setAttribute('data-theme', savedTheme);
+if (savedTheme === 'dark') {
+  document.getElementById('darkToggle').checked = true;
+  document.getElementById('darkToggle2').checked = true;
+}
+
+// ── SIDEBAR
+function toggleSidebar() {
+  const sidebar  = document.getElementById('sidebar');
+  const mainWrap = document.getElementById('mainWrap');
+  const overlay  = document.getElementById('sidebarOverlay');
+  const isNowCollapsed = sidebar.classList.toggle('collapsed');
+  if (isNowCollapsed) {
+    mainWrap.style.marginLeft = '0';
+    mainWrap.style.width = '100%';
+  } else {
+    mainWrap.style.marginLeft = '260px';
+    mainWrap.style.width = 'calc(100% - 260px)';
+  }
+  if (window.innerWidth <= 600) {
+    overlay.classList.toggle('show', !isNowCollapsed);
+  }
+}
+
+function toggleSubmenu() {
+  document.getElementById('settingsSubmenu').classList.toggle('open');
+  const arrow = document.getElementById('settingsArrow');
+  arrow.style.transform = document.getElementById('settingsSubmenu').classList.contains('open') ? 'rotate(180deg)' : 'rotate(0)';
+}
+
+// ── PANELS
+const panelTitles = { dashboard:'Dashboard', profile:'My Profile', scores:'My Scores', weekly:'Weekly Data', monthly:'Monthly Data', settings:'Settings' };
+function showPanel(name, el) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  if (el) el.classList.add('active');
+  document.getElementById('topbarTitle').textContent = panelTitles[name]||name;
+
+  // Lazy load data
+  if (name==='scores') loadScores();
+  if (name==='weekly') loadWeeklyCharts();
+  if (name==='monthly') loadMonthlyData();
+  if (name==='profile') loadProfilePanel();
+  if (name==='settings') loadSettingsPanel();
+}
+
+// ── LOAD DASHBOARD
+async function loadDashboard() {
+  try {
+    const res = await fetch(`${API}/analytics/dashboard`,{credentials:'include'});
+    if (!res.ok) { window.location.href='/login'; return; }
+    const d = await res.json();
+    if (d.user) {
+      const name = d.user.Name||'Champion';
+      document.getElementById('topName').textContent = name;
+      document.getElementById('sName').textContent = name;
+      // Auto-set water goal from weight (weight kg x 0.033 litres)
+      if (d.user.Weight_kg) setWaterGoalFromWeight(parseFloat(d.user.Weight_kg));
+      const avatars={'Weight Loss':'🏃','Muscle Gain':'💪','Maintenance':'⚖️','Endurance':'🚴'};
+      const av = avatars[d.user.Fitness_Goal]||'💪';
+      document.getElementById('sAvatar').textContent = av;
+      const bmi = parseFloat(d.user.BMI)||0;
+      document.getElementById('bmiQuick').textContent = bmi.toFixed(1);
+      let bmiColor, bmiText;
+      if (bmi<18.5){bmiColor='#9a7a00';bmiText='Underweight';}
+      else if(bmi<25){bmiColor='#2d8a57';bmiText='Normal ✅';}
+      else if(bmi<30){bmiColor='#c0392b';bmiText='Overweight';}
+      else{bmiColor='#8b0000';bmiText='Obese';}
+      document.getElementById('bmiStatusQuick').style.color=bmiColor;
+      document.getElementById('bmiStatusQuick').textContent=bmiText;
+    }
+    if (d.today) {
+      const cal=Math.round(d.today.Today_Calories||0);
+      const water=parseFloat(d.today.Today_Water||0).toFixed(1);
+      const exer=Math.round(d.today.Today_Exercise_Min||0);
+      document.getElementById('sCal').textContent=cal;
+      document.getElementById('sWater').textContent=water+'L';
+      document.getElementById('sExer').textContent=exer;
+      const hydPct=Math.min(100,(parseFloat(water)/waterGoal)*100);
+      const exPct=Math.min(100,(exer/exGoal)*100);
+      document.getElementById('hydBar').style.width=hydPct+'%';
+      document.getElementById('hydPct').textContent=Math.round(hydPct)+'%';
+      document.getElementById('exBar').style.width=exPct+'%';
+      document.getElementById('exPct').textContent=Math.round(exPct)+'%';
+    }
+    if (d.progress) {
+      const pts=d.progress.Total_Points||0;
+      const lvl=d.progress.Level_Status||1;
+      const streak=d.progress.Streak_Days||0;
+      document.getElementById('sPts').textContent=pts;
+      document.getElementById('sPtsText').textContent=pts+' pts';
+      document.getElementById('levelNum').textContent=lvl;
+      document.getElementById('levelTitle').textContent=LEVELS[Math.min(lvl-1,LEVELS.length-1)];
+      document.getElementById('sLevelText').textContent=`Level ${lvl} — ${LEVELS[Math.min(lvl-1,LEVELS.length-1)]}`;
+      const ptsInLevel=pts%1000;
+      document.getElementById('levelPts').textContent=`${ptsInLevel} / 1000 pts`;
+      const xpPct=Math.min(100,(ptsInLevel/1000)*100);
+      document.getElementById('xpBar').style.width=xpPct+'%';
+      document.getElementById('xpPct').textContent=Math.round(xpPct)+'%';
+      document.getElementById('streakNum').textContent=streak;
+    }
+  } catch(e){console.error(e);}
+}
+
+// ── LOAD CHART
+let calChartInst = null;
+async function loadChart() {
+  try {
+    const res=await fetch(`${API}/analytics/calories`,{credentials:'include'});
+    const data=await res.json();
+    if (!data.length){document.getElementById('calChart').style.display='none';document.getElementById('chartEmpty').style.display='block';return;}
+    const labels=data.map(d=>d.Log_Date);
+    const consumed=data.map(d=>Math.round(d.Total_Consumed||0));
+    const burned=data.map(d=>Math.round(d.Total_Burned||0));
+    if (calChartInst) calChartInst.destroy();
+    calChartInst = new Chart(document.getElementById('calChart'),{
+      type:'line',
+      data:{labels,datasets:[
+        {label:'Consumed',data:consumed,borderColor:'#ff6b9d',backgroundColor:'rgba(255,107,157,0.1)',tension:0.4,fill:true,pointBackgroundColor:'#ff6b9d',pointRadius:5},
+        {label:'Burned',data:burned,borderColor:'#6bcb77',backgroundColor:'rgba(107,203,119,0.1)',tension:0.4,fill:true,pointBackgroundColor:'#6bcb77',pointRadius:5}
+      ]},
+      options:{responsive:true,plugins:{legend:{labels:{font:{family:'Nunito',weight:'700'},color:'#3a2d5f',padding:16}}},scales:{x:{grid:{display:false},ticks:{font:{family:'Nunito'},color:'#8a7aaa'}},y:{grid:{color:'#ede8ff'},ticks:{font:{family:'Nunito'},color:'#8a7aaa'}}}}
+    });
+  }catch(e){}
+}
+
+// ── LOAD BADGES
+async function loadBadges() {
+  try {
+    const res=await fetch(`${API}/badges`,{credentials:'include'});
+    const badges=await res.json();
+    document.getElementById('badgesGrid').innerHTML=badges.map(b=>`
+      <div class="badge-item ${b.Earned?'earned':'locked'}">
+        <div class="badge-icon">${BADGE_ICONS[b.Badge_Name]||'🏅'}</div>
+        <div class="badge-name">${b.Badge_Name}</div>
+      </div>`).join('');
+  }catch(e){}
+}
+
+// ── LOAD DROPDOWNS
+// Goals — water based on weight (weight kg × 0.033), exercise default 30 min
+let waterGoal = parseFloat(localStorage.getItem('fq_water_goal')) || 2.5;
+let exGoal    = parseInt(localStorage.getItem('fq_ex_goal')) || 30;
+
+function setWaterGoalFromWeight(weightKg) {
+  if (!weightKg || weightKg <= 0) return;
+  // Standard formula: weight(kg) x 0.033 = litres per day, rounded to 1 decimal
+  const calculated = Math.round(weightKg * 0.033 * 10) / 10;
+  waterGoal = calculated;
+  localStorage.setItem('fq_water_goal', waterGoal);
+  updateGoalLabels();
+}
+
+function updateGoalLabels() {
+  const wl = document.getElementById('waterGoalLabel');
+  const el = document.getElementById('exGoalLabel');
+  if (wl) wl.textContent = waterGoal.toFixed(1);
+  if (el) el.textContent = exGoal;
+}
+
+function updateProgress() {
+  const water = parseFloat(document.getElementById('logWater').value) || 0;
+  const exer  = parseInt(document.getElementById('logDur').value) || 0;
+  const hydPct = Math.min(100, (water / waterGoal) * 100);
+  const exPct  = Math.min(100, (exer / exGoal) * 100);
+  document.getElementById('hydBar').style.width = hydPct + '%';
+  document.getElementById('hydPct').textContent = Math.round(hydPct) + '%';
+  document.getElementById('exBar').style.width = exPct + '%';
+  document.getElementById('exPct').textContent = Math.round(exPct) + '%';
+}
+
+function updateCalDisplay() {
+  // optional — could show a calorie ring in future
+}
+
+async function loadDropdowns() {
+  try {
+    const [dRes, eRes] = await Promise.all([
+      fetch(`${API}/diet`, {credentials:'include'}),
+      fetch(`${API}/exercise`, {credentials:'include'})
+    ]);
+
+    if (dRes.status === 401 || eRes.status === 401) {
+      window.location.href = '/login'; return;
+    }
+
+    const diets = dRes.ok ? await dRes.json() : [];
+    const exers = eRes.ok ? await eRes.json() : [];
+
+    const dietSelect = document.getElementById('logDiet');
+    const exerSelect = document.getElementById('logExer');
+
+    if (diets.length > 0) {
+      dietSelect.innerHTML = '<option value="">Select food...</option>' +
+        diets.map(d => `<option value="${d.Diet_ID}">${d.Food_Name} (${d.Calories} kcal)</option>`).join('');
+    } else {
+      dietSelect.innerHTML = '<option value="">No foods found — add in Diet page</option>';
+    }
+
+    if (exers.length > 0) {
+      exerSelect.innerHTML = '<option value="">Select exercise...</option>' +
+        exers.map(e => `<option value="${e.Exercise_ID}">${e.Exercise_Name} (${e.Duration_min} min)</option>`).join('');
+    } else {
+      exerSelect.innerHTML = '<option value="">No exercises found — add in Exercise page</option>';
+    }
+
+    updateGoalLabels();
+  } catch(e) {
+    console.error('Dropdown load error:', e);
+    document.getElementById('logDiet').innerHTML = '<option value="">Could not load — is Flask running?</option>';
+    document.getElementById('logExer').innerHTML = '<option value="">Could not load — is Flask running?</option>';
+  }
+}
+
+// ── LOG ACTIVITY
+async function logActivity() {
+  const btn = document.getElementById('logBtn');
+  const logAlert = document.getElementById('logAlert');
+
+  const dietVal = document.getElementById('logDiet').value;
+  const exerVal = document.getElementById('logExer').value;
+  const calVal  = parseFloat(document.getElementById('logCal').value) || 0;
+  const waterVal= parseFloat(document.getElementById('logWater').value) || 0;
+  const durVal  = parseInt(document.getElementById('logDur').value) || 0;
+  const notes   = document.getElementById('logNotes').value;
+
+  // Require at least one field filled
+  if (!dietVal && !exerVal && !calVal && !waterVal && !durVal) {
+    logAlert.className = 'alert error';
+    logAlert.querySelector('span').textContent = 'Please fill at least one field before logging!';
+    logAlert.style.display = 'flex';
+    return;
+  }
+
+  const body = {
+    diet_id: dietVal || null,
+    exercise_id: exerVal || null,
+    calories_consumed: calVal,
+    water_intake_l: waterVal,
+    exercise_duration_min: durVal,
+    notes: notes
+  };
+
+  const origHTML = btn.innerHTML;
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" style="width:16px;height:16px;animation:spin 0.7s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Logging...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`${API}/log`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      logAlert.className = 'alert success';
+      logAlert.querySelector('span').textContent = data.message || 'Activity logged! +50 pts earned';
+      logAlert.style.display = 'flex';
+
+      // Clear all fields
+      ['logCal','logWater','logDur','logNotes'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('logDiet').value = '';
+      document.getElementById('logExer').value = '';
+
+      // Reset progress bars to 0 after clearing
+      document.getElementById('hydBar').style.width = '0%';
+      document.getElementById('hydPct').textContent = '0%';
+      document.getElementById('exBar').style.width = '0%';
+      document.getElementById('exPct').textContent = '0%';
+
+      // Reload dashboard data after 2 seconds to show updated totals
+      setTimeout(() => {
+        logAlert.style.display = 'none';
+        loadDashboard();
+        loadChart();
+      }, 2000);
+    } else {
+      logAlert.className = 'alert error';
+      logAlert.querySelector('span').textContent = data.error || 'Something went wrong!';
+      logAlert.style.display = 'flex';
+    }
+  } catch(e) {
+    logAlert.className = 'alert error';
+    logAlert.querySelector('span').textContent = 'Cannot connect to server. Is Flask running?';
+    logAlert.style.display = 'flex';
+  }
+
+  btn.innerHTML = origHTML;
+  btn.disabled = false;
+}
+
+// ── SCORES PANEL
+async function loadScores() {
+  try {
+    const [progRes,badgeRes,dashRes]=await Promise.all([
+      fetch(`${API}/progress`,{credentials:'include'}),
+      fetch(`${API}/badges`,{credentials:'include'}),
+      fetch(`${API}/analytics/dashboard`,{credentials:'include'})
+    ]);
+    const prog=await progRes.json();
+    const badges=await badgeRes.json();
+    const dash=await dashRes.json();
+    if(prog){
+      document.getElementById('sc_points').textContent=prog.Total_Points||0;
+      document.getElementById('sc_level').textContent=prog.Level_Status||1;
+      document.getElementById('sc_streak').textContent=prog.Streak_Days||0;
+      document.getElementById('sc_next').textContent=(prog.Points_To_Next_Level||1000)+' pts';
+    }
+    if(dash&&dash.user) document.getElementById('sc_bmi').textContent=parseFloat(dash.user.BMI||0).toFixed(1);
+    const earned=badges.filter(b=>b.Earned).length;
+    document.getElementById('sc_badges').textContent=earned+'/'+badges.length;
+    document.getElementById('scoresAllBadges').innerHTML=badges.map(b=>`
+      <div class="badge-item ${b.Earned?'earned':'locked'}">
+        <div class="badge-icon">${BADGE_ICONS[b.Badge_Name]||'🏅'}</div>
+        <div class="badge-name">${b.Badge_Name}</div>
+      </div>`).join('');
+  }catch(e){}
+}
+
+// ── WEEKLY CHARTS
+let weeklyChartInst=null, hydChartInst=null;
+async function loadWeeklyCharts() {
+  try {
+    const [calRes,hydRes]=await Promise.all([
+      fetch(`${API}/analytics/calories`,{credentials:'include'}),
+      fetch(`${API}/analytics/hydration`,{credentials:'include'})
+    ]);
+    const calData=await calRes.json();
+    const hydData=await hydRes.json();
+    // Weekly calorie chart
+    const last7=calData.slice(-7);
+    if(weeklyChartInst) weeklyChartInst.destroy();
+    weeklyChartInst=new Chart(document.getElementById('weeklyChart'),{
+      type:'bar',
+      data:{labels:last7.map(d=>d.Log_Date),datasets:[
+        {label:'Consumed',data:last7.map(d=>Math.round(d.Total_Consumed||0)),backgroundColor:'rgba(255,107,157,0.7)',borderRadius:8},
+        {label:'Burned',data:last7.map(d=>Math.round(d.Total_Burned||0)),backgroundColor:'rgba(107,203,119,0.7)',borderRadius:8}
+      ]},
+      options:{responsive:true,plugins:{legend:{labels:{font:{family:'Nunito',weight:'700'},color:'#3a2d5f'}}},scales:{x:{grid:{display:false},ticks:{font:{family:'Nunito'},color:'#8a7aaa'}},y:{grid:{color:'#ede8ff'},ticks:{font:{family:'Nunito'},color:'#8a7aaa'}}}}
+    });
+    // Hydration chart
+    if(hydChartInst) hydChartInst.destroy();
+    hydChartInst=new Chart(document.getElementById('hydrationChart'),{
+      type:'bar',
+      data:{labels:hydData.map(d=>d.Log_Date),datasets:[
+        {label:'Water (L)',data:hydData.map(d=>parseFloat(d.Water_Intake_L||0).toFixed(1)),backgroundColor:'rgba(114,183,245,0.7)',borderRadius:8},
+        {label:'Target (2.5L)',data:hydData.map(()=>2.5),type:'line',borderColor:'#5ecfcf',borderDash:[5,5],pointRadius:0,fill:false}
+      ]},
+      options:{responsive:true,plugins:{legend:{labels:{font:{family:'Nunito',weight:'700'},color:'#3a2d5f'}}},scales:{x:{grid:{display:false},ticks:{font:{family:'Nunito'},color:'#8a7aaa'}},y:{grid:{color:'#ede8ff'},ticks:{font:{family:'Nunito'},color:'#8a7aaa'}}}}
+    });
+  }catch(e){}
+}
+
+// ── MONTHLY DATA
+let monthlyChartInst=null;
+async function loadMonthlyData() {
+  try {
+    const [calRes,logRes]=await Promise.all([
+      fetch(`${API}/analytics/calories`,{credentials:'include'}),
+      fetch(`${API}/log`,{credentials:'include'})
+    ]);
+    const calData=await calRes.json();
+    const logs=await logRes.json();
+    if(monthlyChartInst) monthlyChartInst.destroy();
+    monthlyChartInst=new Chart(document.getElementById('monthlyChart'),{
+      type:'line',
+      data:{labels:calData.map(d=>d.Log_Date),datasets:[
+        {label:'Consumed',data:calData.map(d=>Math.round(d.Total_Consumed||0)),borderColor:'#ff6b9d',backgroundColor:'rgba(255,107,157,0.1)',tension:0.4,fill:true},
+        {label:'Burned',data:calData.map(d=>Math.round(d.Total_Burned||0)),borderColor:'#6bcb77',backgroundColor:'rgba(107,203,119,0.1)',tension:0.4,fill:true}
+      ]},
+      options:{responsive:true,plugins:{legend:{labels:{font:{family:'Nunito',weight:'700'},color:'#3a2d5f'}}},scales:{x:{grid:{display:false},ticks:{font:{family:'Nunito'},color:'#8a7aaa'}},y:{grid:{color:'#ede8ff'},ticks:{font:{family:'Nunito'},color:'#8a7aaa'}}}}
+    });
+    // Monthly table
+    const el=document.getElementById('monthlyTable');
+    if(!logs.length){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--light);font-weight:700">No logs yet! Start logging your activities.</div>';return;}
+    el.innerHTML=`<table class="data-table">
+      <tr><th>Date</th><th>Food</th><th>Exercise</th><th>Calories</th><th>Water</th></tr>
+      ${logs.slice(0,30).map(l=>`<tr>
+        <td>${l.Log_Date}</td>
+        <td>${l.Food_Name||'–'}</td>
+        <td>${l.Exercise_Name||'–'}</td>
+        <td style="color:var(--pink);font-weight:800">${l.Calories_Consumed||0} kcal</td>
+        <td style="color:var(--blue);font-weight:800">${parseFloat(l.Water_Intake_L||0).toFixed(1)}L</td>
+      </tr>`).join('')}
+    </table>`;
+  }catch(e){}
+}
+
+// ── PROFILE PANEL
+async function loadProfilePanel() {
+  try {
+    const res=await fetch(`${API}/profile`,{credentials:'include'});
+    const p=await res.json();
+    const avatars={'Weight Loss':'🏃','Muscle Gain':'💪','Maintenance':'⚖️','Endurance':'🚴'};
+    document.getElementById('profileAvatar').textContent=avatars[p.Fitness_Goal]||'💪';
+    document.getElementById('profileName').textContent=p.Name||'–';
+    document.getElementById('profileEmail').textContent=p.Email||'–';
+    document.getElementById('profileGoal').textContent='🎯 '+p.Fitness_Goal;
+    document.getElementById('profileBMIBadge').textContent='📊 BMI: '+p.BMI;
+    const rows=[
+      {icon:'🎂',label:'Age',val:p.Age+' years'},
+      {icon:'⚧',label:'Gender',val:p.Gender},
+      {icon:'📏',label:'Height',val:p.Height_cm+' cm'},
+      {icon:'⚖️',label:'Weight',val:p.Weight_kg+' kg'},
+      {icon:'⭐',label:'Points',val:p.Total_Points},
+      {icon:'🔥',label:'Streak',val:p.Streak_Days+' days'},
+    ];
+    document.getElementById('profileInfoRows').innerHTML=rows.map(r=>`
+      <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:13px;font-weight:700;color:var(--light)">${r.icon} ${r.label}</span>
+        <span style="font-size:14px;font-weight:800;color:var(--text)">${r.val||'–'}</span>
+      </div>`).join('');
+    // BMI
+    const bmi=parseFloat(p.BMI)||0;
+    document.getElementById('pBMIVal').textContent=bmi.toFixed(1);
+    let bmiColor,bmiText,bmiAdvice,bmiPos;
+    if(bmi<18.5){bmiColor='#9a7a00';bmiText='Underweight';bmiAdvice='Focus on nutritious foods!';bmiPos=10;}
+    else if(bmi<25){bmiColor='#2d8a57';bmiText='Normal ✅';bmiAdvice='Great! Keep it up!';bmiPos=35;}
+    else if(bmi<30){bmiColor='#c0392b';bmiText='Overweight';bmiAdvice='Focus on cardio & diet!';bmiPos=65;}
+    else{bmiColor='#8b0000';bmiText='Obese';bmiAdvice='Consult a doctor!';bmiPos=85;}
+    const lbl=document.getElementById('pBMILabel');
+    lbl.style.background=bmiColor+'22'; lbl.style.color=bmiColor; lbl.textContent=bmiText;
+    document.getElementById('pBMIPtr').style.left=bmiPos+'%';
+    document.getElementById('pBMIAdvice').textContent='💡 '+bmiAdvice;
+  }catch(e){}
+}
+
+// ── SETTINGS PANEL
+async function loadSettingsPanel() {
+  try {
+    const res=await fetch(`${API}/profile`,{credentials:'include'});
+    const p=await res.json();
+    document.getElementById('settingsRest').checked=!!p.Rest_Mode;
+    document.getElementById('settingsInjury').checked=!!p.Is_Injured;
+    document.getElementById('calGoalDisplay').textContent=GOAL_CALS[p.Fitness_Goal]||'2000 kcal';
+  }catch(e){}
+}
+
+async function updateHealthSettings() {
+  const body={rest_mode:document.getElementById('settingsRest').checked?1:0,is_injured:document.getElementById('settingsInjury').checked?1:0};
+  await fetch(`${API}/profile`,{method:'PUT',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify(body)});
+}
+
+// ── DELETE ACCOUNT
+function showDeleteModal(){document.getElementById('deleteModal').classList.add('show');}
+function closeModal(){document.getElementById('deleteModal').classList.remove('show');}
+async function confirmDelete(){
+  try{
+    const res=await fetch(`${API}/delete-account`,{method:'DELETE',credentials:'include'});
+    if(res.ok){alert('Account deleted. Goodbye! 👋');window.location.href='/login';}
+  }catch(e){alert('Error deleting account.');}
+}
+
+// ── LOGOUT
+function confirmLogout(){
+  if(confirm('Are you sure you want to logout?')) logout();
+}
+async function logout(){
+  try{await fetch(`${API}/logout`,{method:'POST',credentials:'include'});}catch(e){}
+  window.location.href='/login';
+}
+
+// ── INIT
+loadDashboard();
+loadChart();
+loadBadges();
+loadDropdowns();
+updateGoalLabels();
+</script>
+</body>
+</html>

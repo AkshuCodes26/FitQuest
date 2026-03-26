@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FitQuest — Begin Your Journey</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --pink:#ff6b9d; --purple:#c77dff; --blue:#72b7f5;
+      --teal:#5ecfcf; --yellow:#ffd166; --green:#6bcb77;
+      --bg:#fdf6ff; --card:#ffffff; --text:#3a2d5f;
+      --light:#8a7aaa; --border:#ede8ff; --input:#fdfaff;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Nunito',sans-serif; background:var(--bg); min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow-x:hidden; }
+
+    /* ANIMATED GRADIENT BANNER */
+    .top-banner { position:fixed; top:0; left:0; right:0; z-index:100; background:linear-gradient(90deg,var(--pink),var(--purple),var(--blue),var(--teal)); background-size:300% 100%; animation:gradShift 4s ease infinite; color:#fff; text-align:center; padding:9px; font-size:13px; font-weight:800; letter-spacing:0.3px; }
+    @keyframes gradShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+
+    /* FLOATING BUBBLES */
+    .bubbles { position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:0; }
+    .bubble { position:absolute; border-radius:50%; opacity:0.09; animation:floatUp linear infinite; }
+    @keyframes floatUp { 0%{transform:translateY(110vh);opacity:0} 10%{opacity:0.09} 90%{opacity:0.09} 100%{transform:translateY(-10vh);opacity:0} }
+
+    .wrapper { position:relative; z-index:1; width:100%; max-width:1000px; margin:80px auto 30px; padding:20px; display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:start; }
+
+    /* LEFT PANEL */
+    .left { animation:fadeL 0.7s ease both; position:sticky; top:90px; }
+    @keyframes fadeL { from{opacity:0;transform:translateX(-30px)} to{opacity:1;transform:translateX(0)} }
+
+    .logo { display:flex; align-items:center; gap:16px; margin-bottom:24px; }
+    .logo-icon { width:70px; height:70px; border-radius:22px; background:linear-gradient(135deg,var(--pink),var(--purple)); display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(199,125,255,0.4); animation:bounce 2.5s ease infinite; }
+    @keyframes bounce { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-8px) rotate(2deg)} }
+    .logo h1 { font-family:'Fredoka One',cursive; font-size:46px; line-height:1; background:linear-gradient(135deg,var(--pink),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .logo p { color:var(--light); font-size:12px; font-weight:700; letter-spacing:0.5px; margin-top:3px; }
+
+    .quote-box { background:linear-gradient(135deg,#fff0f8,#f3eeff); border:2px solid var(--border); border-radius:20px; padding:22px; margin-bottom:22px; position:relative; overflow:hidden; }
+    .quote-box::before { content:'"'; position:absolute; top:-10px; left:14px; font-size:70px; color:var(--purple); opacity:0.10; font-family:serif; }
+    .q-text { font-size:15px; font-weight:800; color:var(--text); line-height:1.6; margin-bottom:6px; transition:opacity 0.4s; }
+    .q-author { font-size:12px; color:var(--light); font-weight:700; }
+
+    .feat-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .feat { background:#fff; border:2px solid var(--border); border-radius:16px; padding:14px; display:flex; align-items:center; gap:12px; transition:transform 0.25s,box-shadow 0.25s; }
+    .feat:hover { transform:translateY(-4px); box-shadow:0 10px 24px rgba(100,60,180,0.1); }
+    .feat-icon { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .feat h4 { font-size:13px; font-weight:800; color:var(--text); }
+    .feat p { font-size:11px; color:var(--light); font-weight:600; }
+
+    /* RIGHT CARD */
+    .card { background:#fff; border-radius:28px; padding:36px; box-shadow:0 20px 60px rgba(100,60,180,0.12); border:2px solid var(--border); animation:fadeR 0.7s ease both; }
+    @keyframes fadeR { from{opacity:0;transform:translateX(30px)} to{opacity:1;transform:translateX(0)} }
+
+    /* TABS */
+    .tabs { display:flex; background:#f5f0ff; border-radius:16px; padding:5px; margin-bottom:28px; gap:4px; }
+    .tab { flex:1; padding:12px; border:none; border-radius:12px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; cursor:pointer; transition:all 0.3s; background:transparent; color:var(--light); display:flex; align-items:center; justify-content:center; gap:6px; }
+    .tab svg { width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
+    .tab.active { background:linear-gradient(135deg,var(--pink),var(--purple)); color:#fff; box-shadow:0 4px 14px rgba(199,125,255,0.4); }
+
+    .panel { display:none; }
+    .panel.active { display:block; }
+
+    .form-h { font-family:'Fredoka One',cursive; font-size:26px; color:var(--text); margin-bottom:3px; }
+    .form-s { font-size:13px; color:var(--light); font-weight:600; margin-bottom:20px; }
+
+    /* STEP PROGRESS (register only) */
+    .step-progress { display:flex; align-items:center; gap:6px; margin-bottom:22px; }
+    .step-dot { width:28px; height:6px; border-radius:99px; background:var(--border); transition:all 0.3s; }
+    .step-dot.active { background:linear-gradient(90deg,var(--pink),var(--purple)); }
+    .step-dot.done { background:var(--green); }
+    .step-label { font-size:12px; font-weight:800; color:var(--light); margin-left:6px; }
+
+    /* STEP PANELS */
+    .reg-step { display:none; animation:stepIn 0.4s ease both; }
+    .reg-step.active { display:block; }
+    @keyframes stepIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+
+    /* INPUT FIELDS */
+    .fg { margin-bottom:14px; }
+    .fg label { display:flex; align-items:center; gap:6px; font-size:11px; font-weight:800; color:var(--text); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px; }
+    .fg label svg { width:13px; height:13px; stroke:var(--purple); fill:none; stroke-width:2; stroke-linecap:round; flex-shrink:0; }
+    .input-wrap { position:relative; }
+    .input-wrap .iicon { position:absolute; left:13px; top:50%; transform:translateY(-50%); width:18px; height:18px; stroke:var(--light); fill:none; stroke-width:2; stroke-linecap:round; pointer-events:none; transition:stroke 0.2s; }
+    .fg input,.fg select { width:100%; padding:12px 14px 12px 42px; border:2px solid var(--border); border-radius:13px; font-family:'Nunito',sans-serif; font-size:14px; font-weight:600; color:var(--text); background:var(--input); outline:none; transition:all 0.2s; appearance:none; }
+    .fg input:focus,.fg select:focus { border-color:var(--purple); box-shadow:0 0 0 4px rgba(199,125,255,0.12); background:#fff; }
+    .fg input:focus ~ .iicon,.fg select:focus ~ .iicon { stroke:var(--purple); }
+    .frow { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+    /* OPTION CARDS (for goals, activity etc) */
+    .opt-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:6px; }
+    .opt-card { border:2px solid var(--border); border-radius:16px; padding:14px 10px; cursor:pointer; text-align:center; transition:all 0.2s; background:#fff; }
+    .opt-card:hover { border-color:var(--purple); background:#f9f5ff; transform:translateY(-2px); }
+    .opt-card.selected { border-color:var(--purple); background:linear-gradient(135deg,#f3eeff,#fff0f8); box-shadow:0 4px 14px rgba(199,125,255,0.2); }
+    .opt-card svg { width:28px; height:28px; stroke:var(--purple); fill:none; stroke-width:1.8; stroke-linecap:round; margin-bottom:6px; }
+    .opt-card.selected svg { stroke:var(--pink); }
+    .opt-card h4 { font-size:13px; font-weight:800; color:var(--text); }
+    .opt-card p { font-size:10px; color:var(--light); font-weight:600; margin-top:2px; }
+
+    /* BMI DISPLAY */
+    .bmi-card { background:linear-gradient(135deg,#f3eeff,#fff0f8); border:2px solid var(--border); border-radius:16px; padding:20px; text-align:center; margin-bottom:14px; display:none; animation:fadeIn 0.4s ease; }
+    .bmi-card.show { display:block; }
+    @keyframes fadeIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+    .bmi-num { font-family:'Fredoka One',cursive; font-size:48px; }
+    .bmi-tag { font-size:13px; font-weight:800; padding:5px 14px; border-radius:99px; display:inline-block; margin:6px 0; }
+    .bmi-bar { background:linear-gradient(90deg,#72b7f5,#6bcb77,#ffd166,#ff9a3c,#ff6b9d); border-radius:99px; height:8px; margin:10px 0; position:relative; }
+    .bmi-ptr { position:absolute; top:-5px; width:18px; height:18px; background:#fff; border:3px solid var(--text); border-radius:50%; transform:translateX(-50%); transition:left 0.8s ease; }
+    .bmi-tip { font-size:12px; color:var(--light); font-weight:700; margin-top:6px; }
+
+    /* BUTTONS */
+    .btn { width:100%; padding:14px; border:none; border-radius:14px; background:linear-gradient(135deg,var(--pink),var(--purple)); color:#fff; font-family:'Nunito',sans-serif; font-size:15px; font-weight:800; cursor:pointer; margin-top:8px; transition:transform 0.2s,box-shadow 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(199,125,255,0.4); }
+    .btn:active { transform:scale(0.98); }
+    .btn svg { width:18px; height:18px; stroke:#fff; fill:none; stroke-width:2.5; stroke-linecap:round; }
+    .btn-back { background:transparent; color:var(--light); border:2px solid var(--border); margin-top:8px; }
+    .btn-back:hover { border-color:var(--purple); color:var(--purple); box-shadow:none; transform:none; }
+    .btn-green { background:linear-gradient(135deg,var(--green),var(--teal)); }
+    .btn-green:hover { box-shadow:0 8px 24px rgba(107,203,119,0.4); }
+
+    .alert { padding:12px 16px; border-radius:12px; font-size:13px; font-weight:700; margin-bottom:14px; display:none; align-items:center; gap:8px; }
+    .alert svg { width:16px; height:16px; flex-shrink:0; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; }
+    .alert.success { background:#e8faf0; color:#2d8a57; border:2px solid #a8e6c0; display:flex; }
+    .alert.error { background:#fff0f3; color:#c0392b; border:2px solid #ffb3c1; display:flex; }
+
+    .divider { text-align:center; color:var(--light); font-size:12px; font-weight:700; margin:14px 0; position:relative; }
+    .divider::before,.divider::after { content:''; position:absolute; top:50%; width:38%; height:1px; background:var(--border); }
+    .divider::before{left:0} .divider::after{right:0}
+
+    .switch-link { text-align:center; font-size:13px; color:var(--light); font-weight:700; }
+    .switch-link span { color:var(--pink); cursor:pointer; font-weight:800; }
+    .switch-link span:hover { text-decoration:underline; }
+
+    .spinner { display:inline-block; width:16px; height:16px; border:3px solid rgba(255,255,255,0.4); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+
+    .confetti-piece { position:fixed; width:10px; height:10px; border-radius:2px; animation:cFall 1.2s ease forwards; pointer-events:none; z-index:999; }
+    @keyframes cFall { 0%{transform:translateY(0) rotate(0deg);opacity:1} 100%{transform:translateY(300px) rotate(720deg);opacity:0} }
+
+    @media(max-width:680px) { .wrapper{grid-template-columns:1fr;margin-top:70px} .left{display:none;position:relative;top:0} }
+  </style>
+</head>
+<body>
+
+<div class="top-banner">Every step counts — Your journey to a healthier you starts RIGHT NOW!</div>
+<div class="bubbles" id="bubbles"></div>
+
+<div class="wrapper">
+  <!-- LEFT -->
+  <div class="left">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v16M18 4v16M3 8h3M18 8h3M3 16h3M18 16h3M6 12h12"/></svg>
+      </div>
+      <div><h1>FitQuest</h1><p>YOUR JOURNEY TO A HEALTHIER YOU</p></div>
+    </div>
+
+    <div class="quote-box">
+      <div class="q-text" id="qText">"The only bad workout is the one that didn't happen!"</div>
+      <div class="q-author" id="qAuth">— FitQuest Team</div>
+    </div>
+
+    <div class="feat-grid">
+      <div class="feat">
+        <div class="feat-icon" style="background:#fff0f8">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff6b9d" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div><h4>Goal Tracking</h4><p>Set & crush goals</p></div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon" style="background:#f0fff4">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6bcb77" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+        </div>
+        <div><h4>Diet Log</h4><p>Track every meal</p></div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon" style="background:#f3eeff">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c77dff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+        </div>
+        <div><h4>Earn Badges</h4><p>Gamified progress</p></div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon" style="background:#f0f8ff">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#72b7f5" stroke-width="2" stroke-linecap="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+        </div>
+        <div><h4>Hydration</h4><p>Never forget water</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT CARD -->
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('login')">
+        <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Login
+      </button>
+      <button class="tab" onclick="switchTab('register')">
+        <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        Register
+      </button>
+    </div>
+
+    <!-- ══ LOGIN ══ -->
+    <div class="panel active" id="loginPanel">
+      <div class="form-h">Welcome Back!</div>
+      <div class="form-s">Ready to crush today's goals?</div>
+      <div class="alert" id="loginAlert">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span></span>
+      </div>
+      <div class="fg">
+        <label><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email Address</label>
+        <div class="input-wrap">
+          <svg class="iicon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <input type="email" id="lEmail" placeholder="you@example.com"/>
+        </div>
+      </div>
+      <div class="fg">
+        <label><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Password</label>
+        <div class="input-wrap">
+          <svg class="iicon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="lPass" placeholder="Your password"/>
+        </div>
+      </div>
+      <button class="btn" onclick="doLogin(this)">
+        <svg viewBox="0 0 24 24"><polyline points="5 12 19 12"/><polyline points="13 6 19 12 13 18"/></svg>
+        Let's Go!
+      </button>
+      <div class="divider">or</div>
+      <div class="switch-link">New here? <span onclick="switchTab('register')">Create your account →</span></div>
+    </div>
+
+    <!-- ══ REGISTER (multi-step with all questions) ══ -->
+    <div class="panel" id="registerPanel">
+      <div class="alert" id="regAlert">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span></span>
+      </div>
+
+      <!-- STEP PROGRESS -->
+      <div class="step-progress">
+        <div class="step-dot active" id="sdot0"></div>
+        <div class="step-dot" id="sdot1"></div>
+        <div class="step-dot" id="sdot2"></div>
+        <div class="step-dot" id="sdot3"></div>
+        <div class="step-dot" id="sdot4"></div>
+        <span class="step-label" id="stepLabel">Step 1 of 5</span>
+      </div>
+
+      <!-- STEP 1: Basic Info -->
+      <div class="reg-step active" id="rstep1">
+        <div class="form-h">Let's start!</div>
+        <div class="form-s">Tell us a little about yourself</div>
+        <div class="fg">
+          <label><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Full Name</label>
+          <div class="input-wrap">
+            <svg class="iicon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" id="rName" placeholder="Your full name"/>
+          </div>
+        </div>
+        <div class="frow">
+          <div class="fg">
+            <label><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Age</label>
+            <div class="input-wrap">
+              <svg class="iicon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <input type="number" id="rAge" placeholder="Age" min="10"/>
+            </div>
+          </div>
+          <div class="fg">
+            <label><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Gender</label>
+            <div class="input-wrap">
+              <svg class="iicon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <select id="rGender"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select>
+            </div>
+          </div>
+        </div>
+        <div class="fg">
+          <label><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email Address</label>
+          <div class="input-wrap">
+            <svg class="iicon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input type="email" id="rEmail" placeholder="you@example.com"/>
+          </div>
+        </div>
+        <div class="fg">
+          <label><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Password</label>
+          <div class="input-wrap">
+            <svg class="iicon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" id="rPass" placeholder="Create a strong password"/>
+          </div>
+        </div>
+        <button class="btn" onclick="nextStep(2)">
+          <svg viewBox="0 0 24 24"><polyline points="5 12 19 12"/><polyline points="13 6 19 12 13 18"/></svg>
+          Continue
+        </button>
+      </div>
+
+      <!-- STEP 2: Body Stats + BMI -->
+      <div class="reg-step" id="rstep2">
+        <div class="form-h">Body Stats</div>
+        <div class="form-s">We'll calculate your BMI instantly!</div>
+        <div class="frow">
+          <div class="fg">
+            <label><svg viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Height (cm)</label>
+            <div class="input-wrap">
+              <svg class="iicon" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <input type="number" id="rHeight" placeholder="e.g. 165" oninput="calcBMI()"/>
+            </div>
+          </div>
+          <div class="fg">
+            <label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>Weight (kg)</label>
+            <div class="input-wrap">
+              <svg class="iicon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+              <input type="number" id="rWeight" placeholder="e.g. 60" oninput="calcBMI()"/>
+            </div>
+          </div>
+        </div>
+        <!-- LIVE BMI CARD -->
+        <div class="bmi-card" id="bmiCard">
+          <div class="bmi-num" id="bmiNum">–</div>
+          <div class="bmi-tag" id="bmiTag">Calculating...</div>
+          <div class="bmi-bar"><div class="bmi-ptr" id="bmiPtr" style="left:10%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:800;color:var(--light)"><span>Under</span><span>Normal</span><span>Over</span><span>Obese</span></div>
+          <div class="bmi-tip" id="bmiTip"></div>
+        </div>
+        <button class="btn" onclick="nextStep(3)">
+          <svg viewBox="0 0 24 24"><polyline points="5 12 19 12"/><polyline points="13 6 19 12 13 18"/></svg>
+          Continue
+        </button>
+        <button class="btn btn-back" onclick="nextStep(1)">Back</button>
+      </div>
+
+      <!-- STEP 3: Fitness Goal -->
+      <div class="reg-step" id="rstep3">
+        <div class="form-h">Your Goal</div>
+        <div class="form-s">What do you want to achieve?</div>
+        <div class="opt-grid">
+          <div class="opt-card" onclick="selectOpt(this,'goal','Weight Loss')">
+            <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><path d="M12 6v6l4 2"/></svg>
+            <h4>Weight Loss</h4><p>Burn fat</p>
+          </div>
+          <div class="opt-card" onclick="selectOpt(this,'goal','Muscle Gain')">
+            <svg viewBox="0 0 24 24"><path d="M6 4v16M18 4v16M3 8h3M18 8h3M3 16h3M18 16h3M6 12h12"/></svg>
+            <h4>Muscle Gain</h4><p>Build strength</p>
+          </div>
+          <div class="opt-card" onclick="selectOpt(this,'goal','Maintenance')">
+            <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <h4>Maintenance</h4><p>Stay fit</p>
+          </div>
+          <div class="opt-card" onclick="selectOpt(this,'goal','Endurance')">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <h4>Endurance</h4><p>Go further</p>
+          </div>
+        </div>
+        <button class="btn" onclick="nextStep(4)" style="margin-top:14px">
+          <svg viewBox="0 0 24 24"><polyline points="5 12 19 12"/><polyline points="13 6 19 12 13 18"/></svg>
+          Continue
+        </button>
+        <button class="btn btn-back" onclick="nextStep(2)">Back</button>
+      </div>
+
+      <!-- STEP 4: Activity Level -->
+      <div class="reg-step" id="rstep4">
+        <div class="form-h">Activity Level</div>
+        <div class="form-s">How active are you currently?</div>
+        <div class="opt-grid">
+          <div class="opt-card" onclick="selectOpt(this,'activity','Sedentary')">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <h4>Sedentary</h4><p>Little exercise</p>
+          </div>
+          <div class="opt-card" onclick="selectOpt(this,'activity','Lightly Active')">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><path d="M12 7v6l-3 3M12 13l3 3M12 7l-4 4 4 4"/></svg>
+            <h4>Light</h4><p>1-3 days/week</p>
+          </div>
+          <div class="opt-card" onclick="selectOpt(this,'activity','Moderately Active')">
+            <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            <h4>Moderate</h4><p>3-5 days/week</p>
+          </div>
+          <div class="opt-card" onclick="selectOpt(this,'activity','Very Active')">
+            <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            <h4>Very Active</h4><p>6-7 days/week</p>
+          </div>
+        </div>
+        <button class="btn" onclick="nextStep(5)" style="margin-top:14px">
+          <svg viewBox="0 0 24 24"><polyline points="5 12 19 12"/><polyline points="13 6 19 12 13 18"/></svg>
+          Continue
+        </button>
+        <button class="btn btn-back" onclick="nextStep(3)">Back</button>
+      </div>
+
+      <!-- STEP 5: Diet Preference + Submit -->
+      <div class="reg-step" id="rstep5">
+        <div class="form-h">Diet Preference</div>
+        <div class="form-s">What kind of food do you prefer?</div>
+        <div class="opt-grid">
+          <div class="opt-card" onclick="selectOpt(this,'diet','South Indian')">
+            <svg viewBox="0 0 24 24"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+            <h4>South Indian</h4><p>Idli, dosa, rice</p>
+          </div>
+          <div class="opt-card" onclick="selectOpt(this,'diet','North Indian')">
+            <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+            <h4>North Indian</h4><p>Roti, dal, sabzi</p>
+          </div>
+          <div class="opt-card" onclick="selectOpt(this,'diet','Continental')">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <h4>Continental</h4><p>Salads, pasta</p>
+          </div>
+          <div class="opt-card" onclick="selectOpt(this,'diet','Mixed')">
+            <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            <h4>Mixed</h4><p>Everything!</p>
+          </div>
+        </div>
+        <button class="btn btn-green" onclick="doRegister(this)" style="margin-top:14px">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Create My Account!
+        </button>
+        <button class="btn btn-back" onclick="nextStep(4)">Back</button>
+        <div class="divider">or</div>
+        <div class="switch-link">Already a member? <span onclick="switchTab('login')">Login here →</span></div>
+      </div>
+
+    </div><!-- end registerPanel -->
+  </div>
+</div>
+
+<script>
+const API = '/api';
+const COLORS = ['#ff6b9d','#c77dff','#72b7f5','#5ecfcf','#ffd166','#6bcb77'];
+const answers = { goal:'', activity:'', diet:'' };
+let currentStep = 1;
+
+// Bubbles
+const bb = document.getElementById('bubbles');
+for(let i=0;i<16;i++){
+  const b=document.createElement('div'); b.className='bubble';
+  const s=Math.random()*60+20;
+  b.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;background:${COLORS[Math.floor(Math.random()*COLORS.length)]};animation-duration:${Math.random()*12+8}s;animation-delay:${Math.random()*8}s;`;
+  bb.appendChild(b);
+}
+
+// Quotes
+const QUOTES=[
+  {t:'"The only bad workout is the one that didn\'t happen!"',a:'— FitQuest Team'},
+  {t:'"Take care of your body. It\'s the only place you have to live."',a:'— Jim Rohn'},
+  {t:'"Small daily improvements lead to stunning results!"',a:'— Robin Sharma'},
+  {t:'"Your body can stand almost anything. It\'s your mind you have to convince."',a:'— Unknown'},
+  {t:'"Believe in yourself and all that you are!"',a:'— Christian D. Larson'},
+];
+let qi=0;
+setInterval(()=>{
+  qi=(qi+1)%QUOTES.length;
+  const qt=document.getElementById('qText');
+  qt.style.opacity=0;
+  setTimeout(()=>{ qt.textContent=QUOTES[qi].t; document.getElementById('qAuth').textContent=QUOTES[qi].a; qt.style.transition='opacity 0.5s'; qt.style.opacity=1; },400);
+},5000);
+
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='register')));
+  document.getElementById('loginPanel').classList.toggle('active',tab==='login');
+  document.getElementById('registerPanel').classList.toggle('active',tab==='register');
+  if(tab==='register') updateStepUI(currentStep);
+}
+
+function showAlert(id,type,msg){
+  const e=document.getElementById(id);
+  e.className=`alert ${type}`;
+  e.querySelector('span').textContent=msg;
+}
+
+function confetti(x,y){
+  for(let i=0;i<20;i++){
+    const c=document.createElement('div'); c.className='confetti-piece';
+    c.style.cssText=`left:${x+(Math.random()-.5)*200}px;top:${y}px;background:${COLORS[Math.floor(Math.random()*COLORS.length)]};animation-delay:${Math.random()*0.3}s;`;
+    document.body.appendChild(c); setTimeout(()=>c.remove(),1500);
+  }
+}
+
+// STEP NAVIGATION
+function nextStep(n){
+  // Validate current step
+  if(n===2){
+    if(!document.getElementById('rName').value.trim()) return showAlert('regAlert','error','Please enter your name!');
+    if(!document.getElementById('rAge').value) return showAlert('regAlert','error','Please enter your age!');
+    if(!document.getElementById('rGender').value) return showAlert('regAlert','error','Please select your gender!');
+    if(!document.getElementById('rEmail').value.trim()) return showAlert('regAlert','error','Please enter your email!');
+    if(!document.getElementById('rPass').value) return showAlert('regAlert','error','Please create a password!');
+    document.getElementById('regAlert').className='alert';
+  }
+  if(n===3){
+    if(!document.getElementById('rHeight').value) return showAlert('regAlert','error','Please enter your height!');
+    if(!document.getElementById('rWeight').value) return showAlert('regAlert','error','Please enter your weight!');
+    document.getElementById('regAlert').className='alert';
+  }
+  if(n===4 && !answers.goal) return showAlert('regAlert','error','Please select your fitness goal!');
+  if(n===5 && !answers.activity) return showAlert('regAlert','error','Please select your activity level!');
+
+  // Hide all steps
+  document.querySelectorAll('.reg-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('rstep'+n).classList.add('active');
+  currentStep = n;
+  updateStepUI(n);
+  document.getElementById('regAlert').className='alert';
+}
+
+function updateStepUI(n){
+  for(let i=0;i<5;i++){
+    const dot=document.getElementById('sdot'+i);
+    dot.classList.remove('active','done');
+    if(i===n-1) dot.classList.add('active');
+    else if(i<n-1) dot.classList.add('done');
+  }
+  document.getElementById('stepLabel').textContent=`Step ${n} of 5`;
+}
+
+function selectOpt(el,key,val){
+  el.closest('.opt-grid').querySelectorAll('.opt-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[key]=val;
+  document.getElementById('regAlert').className='alert';
+}
+
+// LIVE BMI
+function calcBMI(){
+  const h=parseFloat(document.getElementById('rHeight').value);
+  const w=parseFloat(document.getElementById('rWeight').value);
+  if(!h||!w||h<50||w<10) return;
+  const bmi=(w/((h/100)**2)).toFixed(1);
+  const card=document.getElementById('bmiCard');
+  card.classList.add('show');
+  document.getElementById('bmiNum').textContent=bmi;
+  let color,label,tip,pos;
+  if(bmi<18.5){color='#9a7a00';label='Underweight';tip='Focus on nutritious calorie-dense foods!';pos=8;}
+  else if(bmi<25){color='#2d8a57';label='Normal ✓';tip='Great! Keep up the balanced lifestyle!';pos=35;}
+  else if(bmi<30){color='#c0392b';label='Overweight';tip='Cardio and a calorie deficit can help!';pos=65;}
+  else{color='#8b0000';label='Obese';tip='Please consult a doctor for guidance!';pos=85;}
+  document.getElementById('bmiNum').style.color=color;
+  const tag=document.getElementById('bmiTag');
+  tag.textContent=label; tag.style.background=color+'20'; tag.style.color=color;
+  document.getElementById('bmiPtr').style.left=pos+'%';
+  document.getElementById('bmiTip').textContent='Tip: '+tip;
+}
+
+// REGISTER (collects everything, then goes to login)
+async function doRegister(btn){
+  if(!answers.diet) return showAlert('regAlert','error','Please select your diet preference!');
+  const body={
+    name: document.getElementById('rName').value.trim(),
+    age: parseInt(document.getElementById('rAge').value),
+    gender: document.getElementById('rGender').value,
+    email: document.getElementById('rEmail').value.trim(),
+    password: document.getElementById('rPass').value,
+    height_cm: parseFloat(document.getElementById('rHeight').value),
+    weight_kg: parseFloat(document.getElementById('rWeight').value),
+    fitness_goal: answers.goal,
+  };
+  const orig=btn.innerHTML; btn.innerHTML='<span class="spinner"></span>'; btn.disabled=true;
+  try{
+    const res=await fetch(`${API}/register`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify(body)});
+    const data=await res.json();
+    if(res.ok){
+      showAlert('regAlert','success','Account created! Please login to continue!');
+      confetti(btn.getBoundingClientRect().left+60,btn.getBoundingClientRect().top);
+      setTimeout(()=>switchTab('login'),2000);
+    } else showAlert('regAlert','error',data.error);
+  } catch { showAlert('regAlert','error','Cannot connect to server. Is Flask running?'); }
+  btn.innerHTML=orig; btn.disabled=false;
+}
+
+// LOGIN → /dashboard
+async function doLogin(btn){
+  const email=document.getElementById('lEmail').value.trim();
+  const password=document.getElementById('lPass').value;
+  if(!email||!password) return showAlert('loginAlert','error','Please fill in all fields!');
+  const orig=btn.innerHTML; btn.innerHTML='<span class="spinner"></span>'; btn.disabled=true;
+  try{
+    const res=await fetch(`${API}/login`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({email,password})});
+    const data=await res.json();
+    if(res.ok){
+      showAlert('loginAlert','success',`Welcome back, ${data.user.name}! Redirecting...`);
+      confetti(btn.getBoundingClientRect().left+60,btn.getBoundingClientRect().top);
+      localStorage.setItem('fq_user',JSON.stringify(data.user));
+      setTimeout(()=>window.location.href='/dashboard',1500);
+    } else { showAlert('loginAlert','error',data.error); btn.innerHTML=orig; btn.disabled=false; }
+  } catch { showAlert('loginAlert','error','Cannot connect to server. Is Flask running?'); btn.innerHTML=orig; btn.disabled=false; }
+}
+</script>
+</body>
+</html>
